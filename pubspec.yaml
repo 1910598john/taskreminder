@@ -40,6 +40,8 @@ dependencies:
   dropdown_textfield: ^1.0.8
   day_picker: ^2.1.1
   path_provider: ^2.0.13
+  cron: ^0.5.1
+  workmanager: ^0.5.1
 
 dev_dependencies:
   flutter_test:

@@ -74,13 +74,121 @@ class _History extends State<History> {
         Expanded(
             child: Container(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
-                child: ListView.builder(
-                    itemCount: itemcount,
-                    itemBuilder: ((context, index) => buildTaskList(index))))),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(30, 3, 30, 3),
+                      child: Column(children: [
+                        Container(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '1:00 PM',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                Text(
+                                  'Faculty meeting',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 78, 49, 170),
+                                      fontSize: 13),
+                                ),
+                                Text(
+                                  "Only once",
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 78, 49, 170),
+                                      fontSize: 13),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.delete_sharp,
+                                  color: Color.fromARGB(255, 78, 49, 170),
+                                  size: 30,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                  height: 0,
+                                ),
+                                Icon(
+                                  Icons.repeat,
+                                  color: Color.fromARGB(255, 78, 49, 170),
+                                  size: 30,
+                                ),
+                              ],
+                            )
+                          ],
+                        )),
+                        Divider(
+                          color: Color.fromARGB(255, 78, 49, 170),
+                        )
+                      ]),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(30, 3, 30, 3),
+                      child: Column(children: [
+                        Container(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '2:00 PM',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                Text(
+                                  "Make a lesson plan",
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 78, 49, 170),
+                                      fontSize: 13),
+                                ),
+                                Text(
+                                  'Remind, Mon Wed Fri',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 78, 49, 170),
+                                      fontSize: 13),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.delete_sharp,
+                                  color: Color.fromARGB(255, 78, 49, 170),
+                                  size: 30,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                  height: 0,
+                                ),
+                                Icon(
+                                  Icons.repeat,
+                                  color: Color.fromARGB(255, 78, 49, 170),
+                                  size: 30,
+                                ),
+                              ],
+                            )
+                          ],
+                        )),
+                      ]),
+                    )
+                  ],
+                ))),
       ]),
     );
   }
-
+  /*
   test(index) {
     if (index == (itemcount - 1)) {
       return Container(
@@ -101,7 +209,7 @@ class _History extends State<History> {
                   Text(
                     'Eat breakfast',
                     style: TextStyle(
-                        color: Color.fromARGB(255, 78, 49, 170), fontSize: 15),
+                        color: Color.fromARGB(255, 78, 49, 170), fontSize: 13),
                   )
                 ],
               ),
@@ -146,7 +254,7 @@ class _History extends State<History> {
                   Text(
                     'Eat breakfast',
                     style: TextStyle(
-                        color: Color.fromARGB(255, 78, 49, 170), fontSize: 15),
+                        color: Color.fromARGB(255, 78, 49, 170), fontSize: 13),
                   )
                 ],
               ),
@@ -179,4 +287,5 @@ class _History extends State<History> {
   }
 
   buildTaskList(int index) => test(index);
+  */
 }

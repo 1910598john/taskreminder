@@ -9,9 +9,12 @@ class SetAlarm extends StatefulWidget {
   _SetAlarm createState() => _SetAlarm();
 }
 
+enum Snooze { three, five, ten, twenty }
+
 class _SetAlarm extends State<SetAlarm> {
   late DataBase handler;
-  Future<int> insertTask(task, time, weekday) async {
+
+  Future<int> insertTask(task, time, weekday, snooze) async {
     String repeat = "Remind, ";
     String status = 'active';
     if (weekdays_list.isNotEmpty) {
@@ -21,8 +24,12 @@ class _SetAlarm extends State<SetAlarm> {
     } else {
       repeat = "Only once";
     }
-    Tasks2 data =
-        Tasks2(task: task, time: time, status: status, repeat: repeat);
+    Tasks2 data = Tasks2(
+        task: task,
+        time: time,
+        status: status,
+        repeat: repeat,
+        snooze: snooze.toString());
     List<Tasks2> list = [data];
     return await handler.insertTask(list);
   }
@@ -41,6 +48,8 @@ class _SetAlarm extends State<SetAlarm> {
   String pickedTime = '';
   List<String> weekdays_list = [];
   bool snooze = true;
+  int repeat = 5; //repeat after minutes
+  Snooze? _snooze = Snooze.three;
   TextEditingController task = TextEditingController();
 
   initialTime() {
@@ -269,25 +278,121 @@ class _SetAlarm extends State<SetAlarm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Snooze",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Color.fromARGB(255, 78, 49, 170),
-                        ),
-                      ),
-                      Text(
-                        "3 times, Every 5 minutes",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Color.fromARGB(255, 78, 49, 170),
-                        ),
-                      )
-                    ],
-                  ),
+                  InkWell(
+                      onTap: () {
+                        showDialog<void>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                                  title: Text('Repeat reminder after:'),
+                                  content: Container(
+                                      height: 150,
+                                      child: Column(children: [
+                                        Expanded(
+                                            child: InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    repeat = 3;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Container(
+                                                    padding: EdgeInsets.all(5),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text('3 minutes'),
+                                                      ],
+                                                    )))),
+                                        Expanded(
+                                            child: InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    repeat = 5;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Container(
+                                                    padding: EdgeInsets.all(5),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text('5 minutes'),
+                                                      ],
+                                                    )))),
+                                        Expanded(
+                                            child: InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    repeat = 10;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Container(
+                                                    padding: EdgeInsets.all(5),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text('10 minutes'),
+                                                      ],
+                                                    )))),
+                                        Expanded(
+                                            child: InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    repeat = 20;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Container(
+                                                    padding: EdgeInsets.all(5),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text('20 minutes'),
+                                                      ],
+                                                    )))),
+                                      ])),
+                                ));
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Snooze",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Color.fromARGB(255, 78, 49, 170),
+                            ),
+                          ),
+                          Text(
+                            "3 times, Every $repeat minutes",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color.fromARGB(255, 78, 49, 170),
+                            ),
+                          )
+                        ],
+                      )),
                   Switch(
                     // This bool value toggles the switch.
                     value: snooze,
@@ -335,7 +440,7 @@ class _SetAlarm extends State<SetAlarm> {
                     }
                   }
 
-                  await insertTask(task.text, pickedTime, weekday);
+                  await insertTask(task.text, pickedTime, weekday, repeat);
                   setState(() {
                     weekdays.forEach((element) {
                       element.isSelected = false;

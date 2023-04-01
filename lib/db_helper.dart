@@ -10,7 +10,7 @@ class DataBase {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL)",
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze TEXT NOT NULL)",
         );
         await db.execute(
           "CREATE TABLE gender(gender TEXT NOT NULL, honorific TEXT NOT NULL)",
@@ -87,20 +87,29 @@ class Tasks2 {
   late final String time;
   late final String status;
   late final String repeat;
+  late final String snooze;
 
   Tasks2({
     required this.task,
     required this.time,
     required this.status,
     required this.repeat,
+    required this.snooze,
   });
 
   Tasks2.fromMap(Map<String, dynamic> result)
       : task = result["task"],
         time = result["time"],
         status = result["status"],
-        repeat = result['repeat'];
+        repeat = result['repeat'],
+        snooze = result['snooze'];
   Map<String, Object> toMap() {
-    return {'task': task, 'time': time, 'status': status, 'repeat': repeat};
+    return {
+      'task': task,
+      'time': time,
+      'status': status,
+      'repeat': repeat,
+      'snooze': snooze
+    };
   }
 }

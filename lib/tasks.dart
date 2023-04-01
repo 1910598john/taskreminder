@@ -129,32 +129,95 @@ class _Tasks extends State<Tasks> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              snapshot.data![index].time,
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 20),
-                                            ),
-                                            Text(
-                                              toDo,
-                                              style: const TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 78, 49, 170),
-                                                  fontSize: 13),
-                                            ),
-                                            Text(
-                                              snapshot.data![index].repeat,
-                                              style: const TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 78, 49, 170),
-                                                  fontSize: 13),
-                                            )
-                                          ],
-                                        ),
+                                        InkWell(
+                                            onTap: () {
+                                              showDialog<void>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title: Text(snapshot
+                                                          .data![index].time),
+                                                      content: Container(
+                                                        height: 100,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .task,
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                            SizedBox(
+                                                              height: 4,
+                                                              width: 0,
+                                                            ),
+                                                            Text(snapshot
+                                                                .data![index]
+                                                                .repeat),
+                                                            SizedBox(
+                                                              height: 4,
+                                                              width: 0,
+                                                            ),
+                                                            Text(
+                                                                "3 times, Every ${snapshot.data![index].snooze} minutes"),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      actions: [
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: Text(
+                                                              'OK',
+                                                              style: TextStyle(
+                                                                color: const Color
+                                                                        .fromARGB(
+                                                                    255,
+                                                                    78,
+                                                                    49,
+                                                                    170),
+                                                              ),
+                                                            ))
+                                                      ],
+                                                    );
+                                                  });
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  snapshot.data![index].time,
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20),
+                                                ),
+                                                Text(
+                                                  toDo,
+                                                  style: const TextStyle(
+                                                      color: Color.fromARGB(
+                                                          255, 78, 49, 170),
+                                                      fontSize: 13),
+                                                ),
+                                                Text(
+                                                  snapshot.data![index].repeat,
+                                                  style: const TextStyle(
+                                                      color: Color.fromARGB(
+                                                          255, 78, 49, 170),
+                                                      fontSize: 13),
+                                                )
+                                              ],
+                                            )),
                                         Switch(
                                           // This bool value toggles the switch.
                                           value: status[index],
@@ -183,32 +246,95 @@ class _Tasks extends State<Tasks> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              snapshot.data![index].time,
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 20),
-                                            ),
-                                            Text(
-                                              toDo,
-                                              style: const TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 78, 49, 170),
-                                                  fontSize: 13),
-                                            ),
-                                            Text(
-                                              snapshot.data![index].repeat,
-                                              style: const TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 78, 49, 170),
-                                                  fontSize: 13),
-                                            )
-                                          ],
-                                        ),
+                                        InkWell(
+                                            onTap: () {
+                                              showDialog<void>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title: Text(snapshot
+                                                          .data![index].time),
+                                                      content: Container(
+                                                        height: 100,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .task,
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                            SizedBox(
+                                                              height: 4,
+                                                              width: 0,
+                                                            ),
+                                                            Text(snapshot
+                                                                .data![index]
+                                                                .repeat),
+                                                            SizedBox(
+                                                              height: 4,
+                                                              width: 0,
+                                                            ),
+                                                            Text(
+                                                                "3 times, Every ${snapshot.data![index].snooze} minutes"),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      actions: [
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: Text(
+                                                              'OK',
+                                                              style: TextStyle(
+                                                                  color: const Color
+                                                                          .fromARGB(
+                                                                      255,
+                                                                      78,
+                                                                      49,
+                                                                      170),
+                                                                  fontSize: 17),
+                                                            ))
+                                                      ],
+                                                    );
+                                                  });
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  snapshot.data![index].time,
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20),
+                                                ),
+                                                Text(
+                                                  toDo,
+                                                  style: const TextStyle(
+                                                      color: Color.fromARGB(
+                                                          255, 78, 49, 170),
+                                                      fontSize: 13),
+                                                ),
+                                                Text(
+                                                  snapshot.data![index].repeat,
+                                                  style: const TextStyle(
+                                                      color: Color.fromARGB(
+                                                          255, 78, 49, 170),
+                                                      fontSize: 13),
+                                                )
+                                              ],
+                                            )),
                                         Switch(
                                           // This bool value toggles the switch.
                                           value: status[index],
