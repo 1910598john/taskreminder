@@ -41,7 +41,8 @@ dependencies:
   day_picker: ^2.1.1
   path_provider: ^2.0.13
   cron: ^0.5.1
-  workmanager: ^0.5.1
+  flutter_local_notifications: ^8.2.0
+  
 
 dev_dependencies:
   flutter_test:
