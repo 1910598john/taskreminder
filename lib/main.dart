@@ -1,12 +1,40 @@
+import 'package:cron/cron.dart';
 import 'package:flutter/material.dart';
 import 'package:taskreminder/history.dart';
 import 'package:taskreminder/homescreen.dart';
 import 'package:taskreminder/set_alarm.dart';
 import 'gender.dart';
 import 'db_helper.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:cron/cron.dart';
 
 void main() {
+  AwesomeNotifications().initialize(
+      null,
+      [
+        NotificationChannel(
+            channelKey: 'channelKey',
+            channelName: 'channelName',
+            channelDescription: 'channelDescription')
+      ],
+      debug: true);
+  final cron = Cron();
+  cron.schedule(Schedule.parse('*/3 * * * * *'), () async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 10,
+        channelKey: 'channelKey',
+        title: "Hello, Ma'am!",
+        body: 'It is time to do your task.',
+      ),
+      actionButtons: [
+        NotificationActionButton(
+            key: "snooze", label: "Snooze", color: Colors.blue),
+        NotificationActionButton(
+            key: "dismiss", label: "Dismiss", color: Colors.blue)
+      ],
+    );
+  });
   runApp(MyApp());
 }
 
@@ -18,10 +46,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
-  FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
   @override
   void initState() {
     super.initState();
+    AwesomeNotifications().isNotificationAllowed().then((value) {
+      if (!value) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
+    /*
     var initializationSettingsAndroid =
         new AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = new IOSInitializationSettings();
@@ -29,14 +62,38 @@ class _MyApp extends State<MyApp> {
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     flutterlocalNotificationPlugin = new FlutterLocalNotificationsPlugin();
     flutterlocalNotificationPlugin!.initialize(initializationSettings);
+
+
+
+
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 10,
+        channelKey: 'channelKey',
+        title: "Hello, Ma'am!",
+        body: 'It is time to do your task.',
+      ),
+      actionButtons: [
+        NotificationActionButton(
+            key: "snooze",
+            label: "Snooze",
+            color: Colors.blue),
+        NotificationActionButton(
+            key: "dismiss",
+            label: "Dismiss",
+            color: Colors.blue)
+      ]));
+    */
   }
+
+  int x = 0;
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Plugin example app'),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Plugin example app'),
         ),
         body: Center(
           child: Column(
@@ -44,8 +101,8 @@ class _MyApp extends State<MyApp> {
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               TextButton(
-                onPressed: _showNotificationWithSound,
-                child: new Text('Show Notification With Sound'),
+                onPressed: () {},
+                child: new Text('Show Notification $x'),
               ),
             ],
           ),
@@ -53,7 +110,7 @@ class _MyApp extends State<MyApp> {
       ),
     );
   }
-
+  /*
   Future _showNotificationWithSound() async {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'channelId', 'channelName', 'channelDescription',
@@ -62,12 +119,13 @@ class _MyApp extends State<MyApp> {
         fullScreenIntent: true);
     var iosPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iosPlatformChannelSpecifics,
-    );
+        android: androidPlatformChannelSpecifics,
+        iOS: iosPlatformChannelSpecifics);
 
-    await flutterlocalNotificationPlugin!.show(
-        0, 'TITLE', 'body', platformChannelSpecifics,
-        payload: 'Default_Sound');
-  }
+    return Future.delayed(Duration(seconds: 5), () {
+      return flutterlocalNotificationPlugin!.show(
+          0, 'TITLE', 'body', platformChannelSpecifics,
+          payload: 'Default_Sound');
+    });
+  }*/
 }
