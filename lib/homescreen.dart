@@ -3,6 +3,10 @@ import 'package:taskreminder/tasks.dart';
 import 'set_alarm.dart';
 import 'history.dart';
 import 'package:taskreminder/db_helper.dart';
+import 'package:cron/cron.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,6 +23,62 @@ class _HomeScreen extends State<HomeScreen> {
     super.initState();
     handler = DataBase();
     handler.initializedDB();
+
+    final cron = Cron();
+    cron.schedule(Schedule.parse('*/3 * * * * *'), () async {
+      var initializationSettingsAndroid =
+          new AndroidInitializationSettings('@mipmap/ic_launcher');
+      var initializationSettingsIOS = new IOSInitializationSettings();
+      var initializationSettings = new InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS);
+      flutterlocalNotificationPlugin = new FlutterLocalNotificationsPlugin();
+      flutterlocalNotificationPlugin!.initialize(initializationSettings,
+          onSelectNotification: (String? payload) async {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const Tasks()));
+      });
+
+      _showNotificationWithSound();
+      /*
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 10,
+          channelKey: 'channelKey',
+          title: "Hello, Ma'am!",
+          body: 'It is time to do your task.',
+        ),
+        actionButtons: [
+          NotificationActionButton(
+              key: "snooze", label: "Snooze", color: Colors.blue),
+          NotificationActionButton(
+              key: "dismiss", label: "Dismiss", color: Colors.blue)
+        ],
+      ); */
+    });
+  }
+
+  Future _showNotificationWithSound() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'channelId',
+      'channelName',
+      'channelDescription',
+      importance: Importance.max,
+      priority: Priority.max,
+      fullScreenIntent: true,
+    );
+    var iosPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iosPlatformChannelSpecifics);
+
+    return Future.delayed(Duration(seconds: 5), () {
+      return flutterlocalNotificationPlugin!.show(0, "Hello, Sir!",
+          'It is time for you to do your task.', platformChannelSpecifics,
+          payload: 'Default_Sound');
+    });
   }
 
   @override

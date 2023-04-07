@@ -54,7 +54,7 @@ class _SetAlarm extends State<SetAlarm> {
 
   initialTime() {
     int initialHour = DateTime.now().hour;
-    int initialMin = DateTime.now().minute;
+    int initialMin = DateTime.now().minute + 5;
     int checkHour = initialHour;
     String initialMeridian;
     checkHour > 12 ? initialMeridian = 'PM' : initialMeridian = 'AM';
@@ -73,11 +73,11 @@ class _SetAlarm extends State<SetAlarm> {
   }
 
   void _showTimePicker() {
-    int initialHour = DateTime.now().hour;
-    int initialMin = DateTime.now().minute + 5;
+    int hr = DateTime.now().hour;
+    int min = DateTime.now().minute + 5;
     showTimePicker(
       context: context,
-      initialTime: TimeOfDay(hour: initialHour, minute: initialMin),
+      initialTime: TimeOfDay(hour: hr, minute: min),
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
