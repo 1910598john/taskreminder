@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:day_picker/day_picker.dart';
 import 'package:taskreminder/db_helper.dart';
+import 'tasks.dart';
+import 'homescreen.dart';
 
 class SetAlarm extends StatefulWidget {
   const SetAlarm({Key? key}) : super(key: key);
@@ -24,13 +26,13 @@ class _SetAlarm extends State<SetAlarm> {
     } else {
       repeat = "Only once";
     }
-    Tasks2 data = Tasks2(
+    UserTask data = UserTask(
         task: task,
         time: time,
         status: status,
         repeat: repeat,
         snooze: snooze.toString());
-    List<Tasks2> list = [data];
+    List<UserTask> list = [data];
     return await handler.insertTask(list);
   }
 
@@ -54,7 +56,7 @@ class _SetAlarm extends State<SetAlarm> {
 
   initialTime() {
     int initialHour = DateTime.now().hour;
-    int initialMin = DateTime.now().minute + 5;
+    int initialMin = DateTime.now().minute;
     int checkHour = initialHour;
     String initialMeridian;
     checkHour > 12 ? initialMeridian = 'PM' : initialMeridian = 'AM';
@@ -421,32 +423,38 @@ class _SetAlarm extends State<SetAlarm> {
                   foregroundColor: Colors.white,
                 ),
                 onPressed: () async {
-                  String weekday = '';
-                  for (int i = 0; i < weekdays_list.length; i++) {
-                    if (weekdays_list[i] == 'Sun') {
-                      weekday += '0';
-                    } else if (weekdays_list[i] == 'Mon') {
-                      weekday += '1';
-                    } else if (weekdays_list[i] == 'Tue') {
-                      weekday += '2';
-                    } else if (weekdays_list[i] == 'Wed') {
-                      weekday += '3';
-                    } else if (weekdays_list[i] == 'Thu') {
-                      weekday += '4';
-                    } else if (weekdays_list[i] == 'Fri') {
-                      weekday += '5';
-                    } else if (weekdays_list[i] == 'Sat') {
-                      weekday += '6';
+                  if (task.text.isNotEmpty) {
+                    String weekday = '';
+                    for (int i = 0; i < weekdays_list.length; i++) {
+                      if (weekdays_list[i] == 'Sun') {
+                        weekday += '0';
+                      } else if (weekdays_list[i] == 'Mon') {
+                        weekday += '1';
+                      } else if (weekdays_list[i] == 'Tue') {
+                        weekday += '2';
+                      } else if (weekdays_list[i] == 'Wed') {
+                        weekday += '3';
+                      } else if (weekdays_list[i] == 'Thu') {
+                        weekday += '4';
+                      } else if (weekdays_list[i] == 'Fri') {
+                        weekday += '5';
+                      } else if (weekdays_list[i] == 'Sat') {
+                        weekday += '6';
+                      }
                     }
-                  }
-
-                  await insertTask(task.text, pickedTime, weekday, repeat);
-                  setState(() {
-                    weekdays.forEach((element) {
-                      element.isSelected = false;
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => const Tasks()));
+                    await insertTask(task.text, pickedTime, weekday, repeat);
+                    await const HomeScreen().startService();
+                    setState(() {
+                      weekdays.forEach((element) {
+                        element.isSelected = false;
+                      });
+                      task.text = "";
                     });
-                    task.text = "";
-                  });
+                  }
                 },
                 child: const Text(
                   'Remind me',

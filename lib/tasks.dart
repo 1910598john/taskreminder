@@ -79,7 +79,7 @@ class _Tasks extends State<Tasks> {
         FutureBuilder(
             future: handler.retrieveTasks(),
             builder:
-                (BuildContext context, AsyncSnapshot<List<Tasks2>> snapshot) {
+                (BuildContext context, AsyncSnapshot<List<UserTask>> snapshot) {
               if (snapshot.data!.isEmpty) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,

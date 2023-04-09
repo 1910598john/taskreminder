@@ -42,6 +42,8 @@ dependencies:
   path_provider: ^2.0.13
   cron: ^0.5.1
   flutter_local_notifications: ^8.2.0
+  animated_text_kit: ^4.2.2
+  intl: ^0.18.0
 
   
 
@@ -84,9 +86,12 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-     - family: Coffee
-       fonts:
-         - asset: fonts/TakeCoffee.ttf
+    - family: Coffee
+      fonts:
+      - asset: fonts/TakeCoffee.ttf
+    - family: WorkSans
+      fonts:
+      - asset: fonts/WorkSans.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

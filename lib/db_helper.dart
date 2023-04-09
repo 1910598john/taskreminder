@@ -1,6 +1,5 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-//import 'tasks.dart';
 
 class DataBase {
   Future<Database> initializedDB() async {
@@ -10,7 +9,7 @@ class DataBase {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze TEXT NOT NULL)",
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze TEXT NOT NULL)",
         );
         await db.execute(
           "CREATE TABLE gender(gender TEXT NOT NULL, honorific TEXT NOT NULL)",
@@ -20,9 +19,10 @@ class DataBase {
   }
 
   // insert data
-  Future<int> insertTask(List<Tasks2> task) async {
+  Future<int> insertTask(List<UserTask> task) async {
     int result = 0;
     final Database db = await initializedDB();
+
     for (var item in task) {
       result = await db.insert('tasks', item.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace);
@@ -32,10 +32,23 @@ class DataBase {
   }
 
   // retrieve data
-  Future<List<Tasks2>> retrieveTasks() async {
+  Future<List<UserTask>> retrieveTasks() async {
     final Database db = await initializedDB();
-    final List<Map<String, Object?>> queryResult = await db.query('tasks');
-    return queryResult.map((e) => Tasks2.fromMap(e)).toList();
+    final List<Map<String, Object?>> queryResult =
+        await db.query('tasks', columns: null);
+    return queryResult.map((e) => UserTask.fromMap(e)).toList();
+  }
+
+  Future<void> updateUserTask(int id, String status) async {
+    final db = await initializedDB();
+    await db.update(
+      'tasks',
+      {
+        'status': status,
+      },
+      where: "id = ?",
+      whereArgs: [id],
+    );
   }
 
   // insert data
@@ -68,28 +81,32 @@ class DataBase {
 }
 
 class Gender {
-  //task, time, status, weekday, repeat
+  late final int? id;
   late final String gender;
   late final String honorific;
-  Gender({required this.gender, required this.honorific});
+
+  Gender({this.id, required this.gender, required this.honorific});
 
   Gender.fromMap(Map<String, dynamic> result)
-      : gender = result["gender"],
+      : id = result["id"],
+        gender = result["gender"],
         honorific = result["honorific"];
-  Map<String, Object> toMap() {
-    return {'gender': gender, 'honorific': honorific};
+
+  Map<String, Object?> toMap() {
+    return {'id': id, 'gender': gender, 'honorific': honorific};
   }
 }
 
-class Tasks2 {
-  //task, time, status, weekday, repeat
+class UserTask {
+  late final int? id;
   late final String task;
   late final String time;
   late final String status;
   late final String repeat;
   late final String snooze;
 
-  Tasks2({
+  UserTask({
+    this.id,
     required this.task,
     required this.time,
     required this.status,
@@ -97,19 +114,22 @@ class Tasks2 {
     required this.snooze,
   });
 
-  Tasks2.fromMap(Map<String, dynamic> result)
-      : task = result["task"],
+  UserTask.fromMap(Map<String, dynamic> result)
+      : id = result["id"],
+        task = result["task"],
         time = result["time"],
         status = result["status"],
         repeat = result['repeat'],
         snooze = result['snooze'];
-  Map<String, Object> toMap() {
+
+  Map<String, Object?> toMap() {
     return {
+      'id': id,
       'task': task,
       'time': time,
       'status': status,
       'repeat': repeat,
-      'snooze': snooze
+      'snooze': snooze,
     };
   }
 }
