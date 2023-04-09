@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:day_picker/day_picker.dart';
 import 'package:taskreminder/db_helper.dart';
+import 'package:taskreminder/main.dart';
 import 'tasks.dart';
 import 'homescreen.dart';
 
 class SetAlarm extends StatefulWidget {
-  const SetAlarm({Key? key}) : super(key: key);
+  final Function startService;
+
+  const SetAlarm({Key? key, required this.startService}) : super(key: key);
 
   @override
   _SetAlarm createState() => _SetAlarm();
@@ -442,12 +445,13 @@ class _SetAlarm extends State<SetAlarm> {
                         weekday += '6';
                       }
                     }
+
+                    insertTask(task.text, pickedTime, weekday, repeat);
                     await Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) => const Tasks()));
-                    await insertTask(task.text, pickedTime, weekday, repeat);
-                    await const HomeScreen().startService();
+                    widget.startService();
                     setState(() {
                       weekdays.forEach((element) {
                         element.isSelected = false;

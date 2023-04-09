@@ -7,15 +7,13 @@ import 'package:taskreminder/db_helper.dart';
 import 'package:cron/cron.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:wakelock/wakelock.dart';
 
 FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
+// Create a global key for the HomeScreen widget
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
-
-  Future<void> startService() async {
-    _HomeScreen().startService();
-  }
 
   @override
   _HomeScreen createState() => _HomeScreen();
@@ -37,7 +35,7 @@ class _HomeScreen extends State<HomeScreen> {
   final now = DateTime.now();
   //map tasks
   List<Task> timeList = [];
-  int runningTask = 0;
+  int currentIndex = 0;
 
   @override
   void initState() {
@@ -78,39 +76,43 @@ class _HomeScreen extends State<HomeScreen> {
         }
         if (timeList.isNotEmpty) {
           timeList.sort((a, b) => a.date.compareTo(b.date));
-          final cron = Cron();
-          cron.schedule(
-            Schedule.parse(
-                '${timeList[0].date.minute} ${timeList[0].date.hour} * * *'),
-            () async {
-              var initializationSettingsAndroid =
-                  const AndroidInitializationSettings('@mipmap/ic_launcher');
-              var initializationSettingsIOS = const IOSInitializationSettings();
-              var initializationSettings = InitializationSettings(
-                  android: initializationSettingsAndroid,
-                  iOS: initializationSettingsIOS);
-              flutterlocalNotificationPlugin =
-                  FlutterLocalNotificationsPlugin();
-              await flutterlocalNotificationPlugin!
-                  .initialize(initializationSettings,
-                      onSelectNotification: (String? payload) async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => Speech()));
-                await _showNotificationWithSound();
-              });
-              await _showNotificationWithSound();
-            },
-          );
+          for (int i = 0; i < timeList.length; i++) {
+            var cron = Cron();
+            cron.schedule(
+              Schedule.parse(
+                  '${timeList[i].date.minute} ${timeList[i].date.hour} * * *'),
+              () async {
+                var initializationSettingsAndroid =
+                    const AndroidInitializationSettings('@mipmap/ic_launcher');
+                var initializationSettingsIOS =
+                    const IOSInitializationSettings();
+                var initializationSettings = InitializationSettings(
+                    android: initializationSettingsAndroid,
+                    iOS: initializationSettingsIOS);
+                flutterlocalNotificationPlugin =
+                    FlutterLocalNotificationsPlugin();
+                await flutterlocalNotificationPlugin!
+                    .initialize(initializationSettings,
+                        onSelectNotification: (String? payload) async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => Speech()));
+                });
+
+                await showNotification();
+                Wakelock.enable();
+              },
+            );
+          }
         }
       }
     });
   }
 
-  Future<void> _showNotificationWithSound() async {
+  Future<void> showNotification() async {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'channelId',
+      'channel',
       'channelName',
       'channelDescription',
       importance: Importance.max,
@@ -123,7 +125,7 @@ class _HomeScreen extends State<HomeScreen> {
         iOS: iosPlatformChannelSpecifics);
 
     await flutterlocalNotificationPlugin!.show(0, "Hello, Sir!",
-        'It is time for you to do your task.', platformChannelSpecifics,
+        'It is time to do your task.', platformChannelSpecifics,
         payload: 'Default_Sound');
   }
 
@@ -181,7 +183,8 @@ class _HomeScreen extends State<HomeScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) => const SetAlarm()));
+                      builder: (BuildContext context) =>
+                          SetAlarm(startService: initState)));
             },
             child: Container(
                 padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
