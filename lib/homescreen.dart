@@ -8,9 +8,11 @@ import 'package:cron/cron.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+
+FlutterTts flutterTts = FlutterTts();
 
 FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
-// Create a global key for the HomeScreen widget
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -24,10 +26,12 @@ class Task {
   String time;
   DateTime date;
   String task;
+  String honorific;
   bool status;
   int snooze;
 
-  Task(this.id, this.time, this.date, this.task, this.status, this.snooze);
+  Task(this.id, this.time, this.date, this.task, this.honorific, this.status,
+      this.snooze);
 }
 
 class _HomeScreen extends State<HomeScreen> {
@@ -35,7 +39,8 @@ class _HomeScreen extends State<HomeScreen> {
   final now = DateTime.now();
   //map tasks
   List<Task> timeList = [];
-  int currentIndex = 0;
+  late String userHonorific;
+  bool speaking = true;
 
   @override
   void initState() {
@@ -43,10 +48,15 @@ class _HomeScreen extends State<HomeScreen> {
     handler = DataBase();
     handler.initializedDB();
     startService();
-    //sort by time
   }
 
   void startService() async {
+    //fetch honorific
+    handler.getUserGender().then((value) {
+      setState(() {
+        userHonorific = value[0].honorific;
+      });
+    });
     handler.retrieveTasks().then((value) {
       if (value.isNotEmpty) {
         for (int i = 0; i < value.length; i++) {
@@ -57,18 +67,22 @@ class _HomeScreen extends State<HomeScreen> {
           if (value[i].status == 'active' &&
               (value[i].repeat.contains(weekday) ||
                   value[i].repeat.contains('Only once'))) {
+            //check if time has passed
             DateFormat formatter = DateFormat('hh:mm a');
             DateTime now = DateTime.now();
             var elapsedTime = formatter
                 .parse(DateFormat('hh:mm a').format(now).toString())
                 .difference(
                     DateFormat('hh:mm a').parse(value[i].time.toString()));
+            //if not..
             if (!(elapsedTime.compareTo(const Duration(seconds: 1)) >= 0)) {
+              //list tasks
               timeList.add(Task(
                   "${value[i].id}",
                   value[i].time,
                   DateFormat('hh:mm a').parse(value[i].time.toString()),
                   value[i].task,
+                  userHonorific,
                   true,
                   int.parse(value[i].snooze)));
             }
@@ -97,10 +111,16 @@ class _HomeScreen extends State<HomeScreen> {
                   await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (BuildContext context) => Speech()));
+                          builder: (BuildContext context) => Speech(
+                                task: timeList[i].task,
+                                time: timeList[i].time,
+                                honorific: timeList[i].honorific,
+                                flutterTts: flutterTts,
+                              )));
                 });
 
                 await showNotification();
+                await speak(timeList[i].honorific, timeList[i].task);
                 Wakelock.enable();
               },
             );
@@ -108,6 +128,17 @@ class _HomeScreen extends State<HomeScreen> {
         }
       }
     });
+  }
+
+  Future<void> speak(userHonorific, userTask) async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(1);
+    await flutterTts.setSpeechRate(0.5);
+    for (int i = 0; i < 5; i++) {
+      await flutterTts.speak("$userHonorific, It is time for you to $userTask");
+      await flutterTts.awaitSpeakCompletion(true);
+      Future.delayed(const Duration(seconds: 3));
+    }
   }
 
   Future<void> showNotification() async {

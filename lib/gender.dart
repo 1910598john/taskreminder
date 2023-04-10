@@ -34,7 +34,8 @@ class _CheckGender extends State<CheckGender> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return MaterialApp(
+        home: Scaffold(
       backgroundColor: const Color.fromARGB(255, 178, 141, 255),
       body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -98,6 +99,6 @@ class _CheckGender extends State<CheckGender> {
               ],
             ),
           ]),
-    );
+    ));
   }
 }

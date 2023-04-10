@@ -81,19 +81,17 @@ class DataBase {
 }
 
 class Gender {
-  late final int? id;
   late final String gender;
   late final String honorific;
 
-  Gender({this.id, required this.gender, required this.honorific});
+  Gender({required this.gender, required this.honorific});
 
   Gender.fromMap(Map<String, dynamic> result)
-      : id = result["id"],
-        gender = result["gender"],
+      : gender = result["gender"],
         honorific = result["honorific"];
 
   Map<String, Object?> toMap() {
-    return {'id': id, 'gender': gender, 'honorific': honorific};
+    return {'gender': gender, 'honorific': honorific};
   }
 }
 

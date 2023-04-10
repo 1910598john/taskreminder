@@ -385,15 +385,15 @@ class _SetAlarm extends State<SetAlarm> {
                           Text(
                             "Snooze",
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 18,
                               color: Color.fromARGB(255, 78, 49, 170),
                             ),
                           ),
                           Text(
                             "3 times, Every $repeat minutes",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 13,
-                              color: Color.fromARGB(255, 78, 49, 170),
+                              color: Color.fromARGB(255, 47, 181, 243),
                             ),
                           )
                         ],
@@ -417,13 +417,12 @@ class _SetAlarm extends State<SetAlarm> {
               padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  shadowColor: const Color.fromARGB(255, 78, 49, 170),
                   padding: const EdgeInsets.all(20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  backgroundColor: const Color.fromARGB(255, 78, 49, 170),
-                  foregroundColor: Colors.white,
+                  backgroundColor: Color.fromARGB(255, 47, 181, 243),
+                  fixedSize: const Size(120, 40),
                 ),
                 onPressed: () async {
                   if (task.text.isNotEmpty) {
@@ -447,10 +446,6 @@ class _SetAlarm extends State<SetAlarm> {
                     }
 
                     insertTask(task.text, pickedTime, weekday, repeat);
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => const Tasks()));
                     widget.startService();
                     setState(() {
                       weekdays.forEach((element) {
@@ -462,7 +457,7 @@ class _SetAlarm extends State<SetAlarm> {
                 },
                 child: const Text(
                   'Remind me',
-                  style: TextStyle(fontSize: 15),
+                  style: TextStyle(fontSize: 15, color: Colors.white),
                 ),
               ),
             ),
