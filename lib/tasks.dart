@@ -130,6 +130,8 @@ class _Tasks extends State<Tasks> {
                                           CrossAxisAlignment.center,
                                       children: [
                                         InkWell(
+                                            splashColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
                                             onTap: () {
                                               showDialog<void>(
                                                   context: context,
@@ -154,14 +156,14 @@ class _Tasks extends State<Tasks> {
                                                                   TextOverflow
                                                                       .ellipsis,
                                                             ),
-                                                            SizedBox(
+                                                            const SizedBox(
                                                               height: 4,
                                                               width: 0,
                                                             ),
                                                             Text(snapshot
                                                                 .data![index]
                                                                 .repeat),
-                                                            SizedBox(
+                                                            const SizedBox(
                                                               height: 4,
                                                               width: 0,
                                                             ),
@@ -177,15 +179,15 @@ class _Tasks extends State<Tasks> {
                                                                       context)
                                                                   .pop();
                                                             },
-                                                            child: Text(
+                                                            child: const Text(
                                                               'OK',
                                                               style: TextStyle(
-                                                                color: const Color
-                                                                        .fromARGB(
-                                                                    255,
-                                                                    78,
-                                                                    49,
-                                                                    170),
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        78,
+                                                                        49,
+                                                                        170),
                                                               ),
                                                             ))
                                                       ],
@@ -247,6 +249,8 @@ class _Tasks extends State<Tasks> {
                                           CrossAxisAlignment.center,
                                       children: [
                                         InkWell(
+                                            splashColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
                                             onTap: () {
                                               showDialog<void>(
                                                   context: context,
@@ -271,14 +275,14 @@ class _Tasks extends State<Tasks> {
                                                                   TextOverflow
                                                                       .ellipsis,
                                                             ),
-                                                            SizedBox(
+                                                            const SizedBox(
                                                               height: 4,
                                                               width: 0,
                                                             ),
                                                             Text(snapshot
                                                                 .data![index]
                                                                 .repeat),
-                                                            SizedBox(
+                                                            const SizedBox(
                                                               height: 4,
                                                               width: 0,
                                                             ),
@@ -294,15 +298,15 @@ class _Tasks extends State<Tasks> {
                                                                       context)
                                                                   .pop();
                                                             },
-                                                            child: Text(
+                                                            child: const Text(
                                                               'OK',
                                                               style: TextStyle(
-                                                                  color: const Color
-                                                                          .fromARGB(
-                                                                      255,
-                                                                      78,
-                                                                      49,
-                                                                      170),
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          78,
+                                                                          49,
+                                                                          170),
                                                                   fontSize: 17),
                                                             ))
                                                       ],

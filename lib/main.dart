@@ -10,10 +10,10 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'speech.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(TaskReminder());
 }
 
-class MyApp extends StatelessWidget {
+class TaskReminder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(

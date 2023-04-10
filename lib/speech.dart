@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:taskreminder/homescreen.dart';
+import 'package:wakelock/wakelock.dart';
 
 class Speech extends StatefulWidget {
   final String task;
@@ -25,6 +25,7 @@ class _Speech extends State<Speech> {
   @override
   void initState() {
     super.initState();
+    Wakelock.enable();
   }
 
   @override
@@ -41,7 +42,7 @@ class _Speech extends State<Speech> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 150, 0, 0),
                 child: Image.asset(
                   "assets/images/speech.gif",
                 ),
@@ -60,7 +61,7 @@ class _Speech extends State<Speech> {
                 width: 0,
               ),
               Container(
-                  padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+                  padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                   child: AnimatedTextKit(
                     animatedTexts: [
                       TyperAnimatedText('Hello, ${widget.honorific}.',
@@ -84,13 +85,14 @@ class _Speech extends State<Speech> {
               ),
               Expanded(
                   child: Container(
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 30),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
-                        fixedSize: Size(100, 40),
+                        fixedSize: Size(130, 50),
                       ),
                       onPressed: () async {
                         SystemNavigator.pop();
@@ -107,7 +109,7 @@ class _Speech extends State<Speech> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
-                          fixedSize: Size(100, 40)),
+                          fixedSize: Size(130, 50)),
                       onPressed: () async {
                         SystemNavigator.pop();
                       },

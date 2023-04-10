@@ -34,8 +34,7 @@ class _CheckGender extends State<CheckGender> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
+    return Scaffold(
       backgroundColor: const Color.fromARGB(255, 178, 141, 255),
       body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -63,15 +62,17 @@ class _CheckGender extends State<CheckGender> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
                   onTap: () async {
-                    await userGender("Male", "Sir");
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const HomeScreen()));
+                    await userGender("Male", "Sir");
                   },
                   child: Container(
-                      child: Image(
+                      child: const Image(
                     image: AssetImage("assets/images/male.png"),
                     width: 100,
                     height: 100,
@@ -82,15 +83,17 @@ class _CheckGender extends State<CheckGender> {
                   height: 0,
                 ),
                 InkWell(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
                   onTap: () async {
-                    await userGender("Female", "Ma'am");
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const HomeScreen()));
+                    await userGender("Female", "Ma'am");
                   },
                   child: Container(
-                      child: Image(
+                      child: const Image(
                     image: AssetImage("assets/images/female.png"),
                     width: 100,
                     height: 100,
@@ -99,6 +102,6 @@ class _CheckGender extends State<CheckGender> {
               ],
             ),
           ]),
-    ));
+    );
   }
 }

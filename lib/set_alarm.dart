@@ -59,16 +59,21 @@ class _SetAlarm extends State<SetAlarm> {
 
   initialTime() {
     int initialHour = DateTime.now().hour;
-    int initialMin = DateTime.now().minute;
+    int initialMin = DateTime.now().minute + 5;
     int checkHour = initialHour;
     String initialMeridian;
-    checkHour > 12 ? initialMeridian = 'PM' : initialMeridian = 'AM';
+    if (checkHour >= 12) {
+      initialMeridian = 'PM';
+    } else {
+      initialMeridian = 'AM';
+    }
 
+    if (initialMin > 59) {
+      initialMin -= 60;
+      initialHour += 1;
+    }
     if (initialHour > 12) {
       initialHour -= 12;
-    }
-    if (initialHour == 0) {
-      initialHour += 12;
     }
     if (initialMin < 10) {
       pickedTime = "$initialHour:0$initialMin $initialMeridian";
@@ -105,18 +110,28 @@ class _SetAlarm extends State<SetAlarm> {
     ).then((value) {
       setState(() {
         int hour = value!.hour;
-        String meridian = 'AM';
-        if (hour > 12) {
-          hour -= 12;
+        String meridian;
+        int min = value.minute;
+        if (hour >= 12) {
           meridian = 'PM';
+        } else {
+          meridian = 'AM';
         }
+
         if (hour == 0) {
           hour += 12;
         }
+        if (min > 59) {
+          min -= 60;
+          hour += 1;
+        }
+        if (hour > 12) {
+          hour -= 12;
+        }
         if (value.minute < 10) {
-          pickedTime = "$hour:0${value.minute} $meridian";
+          pickedTime = "$hour:0$min $meridian";
         } else {
-          pickedTime = "$hour:${value.minute} $meridian";
+          pickedTime = "$hour:$min $meridian";
         }
         print(pickedTime);
       });
@@ -159,7 +174,7 @@ class _SetAlarm extends State<SetAlarm> {
       ),
       backgroundColor: const Color.fromARGB(255, 178, 141, 255),
       body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
             Container(
@@ -254,10 +269,10 @@ class _SetAlarm extends State<SetAlarm> {
                 children: [
                   TextField(
                     controller: task,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color.fromARGB(255, 78, 49, 170),
                     ),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Your task',
                       labelStyle: TextStyle(
                         color: Color.fromARGB(255, 78, 49, 170),
@@ -284,6 +299,8 @@ class _SetAlarm extends State<SetAlarm> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   InkWell(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
                       onTap: () {
                         showDialog<void>(
                             context: context,
@@ -309,12 +326,15 @@ class _SetAlarm extends State<SetAlarm> {
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .center,
-                                                      children: [
+                                                      children: const [
                                                         Text('3 minutes'),
                                                       ],
                                                     )))),
                                         Expanded(
                                             child: InkWell(
+                                                splashColor: Colors.transparent,
+                                                highlightColor:
+                                                    Colors.transparent,
                                                 onTap: () {
                                                   setState(() {
                                                     repeat = 5;
@@ -330,7 +350,7 @@ class _SetAlarm extends State<SetAlarm> {
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .center,
-                                                      children: [
+                                                      children: const [
                                                         Text('5 minutes'),
                                                       ],
                                                     )))),
@@ -351,12 +371,15 @@ class _SetAlarm extends State<SetAlarm> {
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .center,
-                                                      children: [
+                                                      children: const [
                                                         Text('10 minutes'),
                                                       ],
                                                     )))),
                                         Expanded(
                                             child: InkWell(
+                                                splashColor: Colors.transparent,
+                                                highlightColor:
+                                                    Colors.transparent,
                                                 onTap: () {
                                                   setState(() {
                                                     repeat = 20;
@@ -372,7 +395,7 @@ class _SetAlarm extends State<SetAlarm> {
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .center,
-                                                      children: [
+                                                      children: const [
                                                         Text('20 minutes'),
                                                       ],
                                                     )))),
@@ -382,7 +405,7 @@ class _SetAlarm extends State<SetAlarm> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "Snooze",
                             style: TextStyle(
                               fontSize: 18,
@@ -393,7 +416,7 @@ class _SetAlarm extends State<SetAlarm> {
                             "3 times, Every $repeat minutes",
                             style: const TextStyle(
                               fontSize: 13,
-                              color: Color.fromARGB(255, 47, 181, 243),
+                              color: Color.fromARGB(255, 78, 49, 170),
                             ),
                           )
                         ],
@@ -401,7 +424,7 @@ class _SetAlarm extends State<SetAlarm> {
                   Switch(
                     // This bool value toggles the switch.
                     value: snooze,
-                    activeColor: Color.fromARGB(255, 78, 49, 170),
+                    activeColor: const Color.fromARGB(255, 78, 49, 170),
                     onChanged: (bool value) {
                       // This is called when the user toggles the switch.
                       setState(() {
@@ -417,12 +440,12 @@ class _SetAlarm extends State<SetAlarm> {
               padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  backgroundColor: Color.fromARGB(255, 47, 181, 243),
-                  fixedSize: const Size(120, 40),
+                  backgroundColor: const Color.fromARGB(255, 78, 49, 170),
+                  foregroundColor: Colors.white,
+                  fixedSize: const Size(150, 50),
                 ),
                 onPressed: () async {
                   if (task.text.isNotEmpty) {
@@ -457,7 +480,7 @@ class _SetAlarm extends State<SetAlarm> {
                 },
                 child: const Text(
                   'Remind me',
-                  style: TextStyle(fontSize: 15, color: Colors.white),
+                  style: TextStyle(fontSize: 15),
                 ),
               ),
             ),

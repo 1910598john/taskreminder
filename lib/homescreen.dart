@@ -7,11 +7,10 @@ import 'package:taskreminder/db_helper.dart';
 import 'package:cron/cron.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:volume_control/volume_control.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 FlutterTts flutterTts = FlutterTts();
-
 FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
 
 class HomeScreen extends StatefulWidget {
@@ -48,6 +47,15 @@ class _HomeScreen extends State<HomeScreen> {
     handler = DataBase();
     handler.initializedDB();
     startService();
+  }
+
+  void setVolume() async {
+    // Get the current volume, min=0, max=1
+    double _val = await VolumeControl.volume;
+
+    if (_val <= 0.4) {
+      VolumeControl.setVolume(0.7);
+    }
   }
 
   void startService() async {
@@ -97,7 +105,8 @@ class _HomeScreen extends State<HomeScreen> {
                   '${timeList[i].date.minute} ${timeList[i].date.hour} * * *'),
               () async {
                 var initializationSettingsAndroid =
-                    const AndroidInitializationSettings('@mipmap/ic_launcher');
+                    const AndroidInitializationSettings(
+                        '@mipmap/launcher_icon');
                 var initializationSettingsIOS =
                     const IOSInitializationSettings();
                 var initializationSettings = InitializationSettings(
@@ -121,7 +130,6 @@ class _HomeScreen extends State<HomeScreen> {
 
                 await showNotification();
                 await speak(timeList[i].honorific, timeList[i].task);
-                Wakelock.enable();
               },
             );
           }
@@ -131,13 +139,14 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   Future<void> speak(userHonorific, userTask) async {
+    setVolume();
     await flutterTts.setLanguage("en-US");
     await flutterTts.setPitch(1);
     await flutterTts.setSpeechRate(0.5);
-    for (int i = 0; i < 5; i++) {
+    while (true) {
       await flutterTts.speak("$userHonorific, It is time for you to $userTask");
       await flutterTts.awaitSpeakCompletion(true);
-      Future.delayed(const Duration(seconds: 3));
+      Future.delayed(const Duration(seconds: 5));
     }
   }
 
@@ -210,6 +219,8 @@ class _HomeScreen extends State<HomeScreen> {
                     fontWeight: FontWeight.w900),
               )),
           InkWell(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
             onTap: () {
               Navigator.push(
                   context,
@@ -248,6 +259,8 @@ class _HomeScreen extends State<HomeScreen> {
             endIndent: 70,
           ),
           InkWell(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
               onTap: () {
                 Navigator.push(
                     context,
@@ -284,6 +297,8 @@ class _HomeScreen extends State<HomeScreen> {
             endIndent: 70,
           ),
           InkWell(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
               onTap: () {
                 Navigator.push(
                     context,
