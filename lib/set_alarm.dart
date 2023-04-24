@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:day_picker/day_picker.dart';
 import 'package:taskreminder/db_helper.dart';
-import 'package:taskreminder/main.dart';
-import 'tasks.dart';
-import 'homescreen.dart';
 
 class SetAlarm extends StatefulWidget {
   final Function startService;
@@ -30,11 +27,7 @@ class _SetAlarm extends State<SetAlarm> {
       repeat = "Only once";
     }
     UserTask data = UserTask(
-        task: task,
-        time: time,
-        status: status,
-        repeat: repeat,
-        snooze: snooze.toString());
+        task: task, time: time, status: status, repeat: repeat, snooze: snooze);
     List<UserTask> list = [data];
     return await handler.insertTask(list);
   }
@@ -53,13 +46,13 @@ class _SetAlarm extends State<SetAlarm> {
   String pickedTime = '';
   List<String> weekdays_list = [];
   bool snooze = true;
-  int repeat = 5; //repeat after minutes
-  Snooze? _snooze = Snooze.three;
+  int repeat = 5; //repeat after (minutes)
+  final Snooze _snooze = Snooze.three;
   TextEditingController task = TextEditingController();
+  int initialHour = DateTime.now().hour;
+  int initialMin = DateTime.now().minute + 5;
 
   initialTime() {
-    int initialHour = DateTime.now().hour;
-    int initialMin = DateTime.now().minute + 5;
     int checkHour = initialHour;
     String initialMeridian;
     if (checkHour >= 12) {
@@ -75,16 +68,24 @@ class _SetAlarm extends State<SetAlarm> {
     if (initialHour > 12) {
       initialHour -= 12;
     }
+    if (initialHour == 0) {
+      initialHour += 12;
+    }
     if (initialMin < 10) {
       pickedTime = "$initialHour:0$initialMin $initialMeridian";
     } else {
       pickedTime = "$initialHour:$initialMin $initialMeridian";
     }
+    return [];
   }
 
   void _showTimePicker() {
     int hr = DateTime.now().hour;
     int min = DateTime.now().minute + 5;
+    if (min > 59) {
+      min -= 60;
+      hr += 1;
+    }
     showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: hr, minute: min),
@@ -128,7 +129,7 @@ class _SetAlarm extends State<SetAlarm> {
         if (hour > 12) {
           hour -= 12;
         }
-        if (value.minute < 10) {
+        if (min < 10) {
           pickedTime = "$hour:0$min $meridian";
         } else {
           pickedTime = "$hour:$min $meridian";
@@ -413,7 +414,7 @@ class _SetAlarm extends State<SetAlarm> {
                             ),
                           ),
                           Text(
-                            "3 times, Every $repeat minutes",
+                            "10 times, Every $repeat minutes",
                             style: const TextStyle(
                               fontSize: 13,
                               color: Color.fromARGB(255, 78, 49, 170),
@@ -429,7 +430,6 @@ class _SetAlarm extends State<SetAlarm> {
                       // This is called when the user toggles the switch.
                       setState(() {
                         snooze = value;
-                        print(snooze);
                       });
                     },
                   )
@@ -468,8 +468,13 @@ class _SetAlarm extends State<SetAlarm> {
                       }
                     }
 
-                    insertTask(task.text, pickedTime, weekday, repeat);
-                    widget.startService();
+                    if (snooze == true) {
+                      await insertTask(task.text, pickedTime, weekday, repeat);
+                    } else {
+                      await insertTask(task.text, pickedTime, weekday, 0);
+                    }
+
+                    await widget.startService();
                     setState(() {
                       weekdays.forEach((element) {
                         element.isSelected = false;

@@ -49,6 +49,10 @@ dependencies:
   flutter_launcher_icons: ^0.13.0
   flutter_native_splash: ^2.2.19
   volume_control: ^0.1.5
+  timezone: ^0.8.0
+  workmanager: ^0.5.1
+  awesome_notifications: ^0.6.19
+
 
 
   

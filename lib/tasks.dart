@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:taskreminder/db_helper.dart';
 
 class Tasks extends StatefulWidget {
-  const Tasks({Key? key}) : super(key: key);
+  final Function startService;
+
+  const Tasks({Key? key, required this.startService}) : super(key: key);
 
   @override
   _Tasks createState() => _Tasks();
@@ -11,6 +13,11 @@ class Tasks extends StatefulWidget {
 class _Tasks extends State<Tasks> {
   late DataBase handler;
   List<bool> status = [];
+
+  void updateTask(id, status) async {
+    await handler.updateTask(id, status);
+    await widget.startService();
+  }
 
   @override
   void initState() {
@@ -23,7 +30,7 @@ class _Tasks extends State<Tasks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 178, 141, 255),
+        backgroundColor: const Color.fromARGB(255, 178, 141, 255),
         elevation: 0,
         leading: BackButton(
           color: const Color.fromARGB(255, 78, 49, 170),
@@ -100,7 +107,7 @@ class _Tasks extends State<Tasks> {
               } else {
                 return Expanded(
                     child: Container(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 35),
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                         child: ListView.builder(
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
@@ -123,13 +130,7 @@ class _Tasks extends State<Tasks> {
                                       const EdgeInsets.fromLTRB(30, 3, 30, 3),
                                   child: Column(children: [
                                     Container(
-                                        child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        InkWell(
+                                        child: InkWell(
                                             splashColor: Colors.transparent,
                                             highlightColor: Colors.transparent,
                                             onTap: () {
@@ -141,7 +142,7 @@ class _Tasks extends State<Tasks> {
                                                       title: Text(snapshot
                                                           .data![index].time),
                                                       content: Container(
-                                                        height: 100,
+                                                        height: 90,
                                                         child: Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -167,12 +168,48 @@ class _Tasks extends State<Tasks> {
                                                               height: 4,
                                                               width: 0,
                                                             ),
-                                                            Text(
-                                                                "3 times, Every ${snapshot.data![index].snooze} minutes"),
+                                                            snapshot
+                                                                        .data![
+                                                                            index]
+                                                                        .snooze ==
+                                                                    0
+                                                                ? Text(
+                                                                    'No repeat')
+                                                                : Text(
+                                                                    "Repeat after ${snapshot.data![index].snooze} minutes")
                                                           ],
                                                         ),
                                                       ),
                                                       actions: [
+                                                        TextButton(
+                                                            onPressed:
+                                                                () async {
+                                                              setState(() {});
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+
+                                                              await handler
+                                                                  .deleteTask(
+                                                                      snapshot
+                                                                          .data![
+                                                                              index]
+                                                                          .id);
+                                                              await widget
+                                                                  .startService();
+                                                            },
+                                                            child: const Text(
+                                                              'DELETE',
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        78,
+                                                                        49,
+                                                                        170),
+                                                              ),
+                                                            )),
                                                         TextButton(
                                                             onPressed: () {
                                                               Navigator.of(
@@ -182,6 +219,7 @@ class _Tasks extends State<Tasks> {
                                                             child: const Text(
                                                               'OK',
                                                               style: TextStyle(
+                                                                fontSize: 15,
                                                                 color: Color
                                                                     .fromARGB(
                                                                         255,
@@ -194,46 +232,71 @@ class _Tasks extends State<Tasks> {
                                                     );
                                                   });
                                             },
-                                            child: Column(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.center,
                                               children: [
-                                                Text(
-                                                  snapshot.data![index].time,
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 20),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      snapshot
+                                                          .data![index].time,
+                                                      style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 20),
+                                                    ),
+                                                    Text(
+                                                      toDo,
+                                                      style: const TextStyle(
+                                                          color: Color.fromARGB(
+                                                              255, 78, 49, 170),
+                                                          fontSize: 13),
+                                                    ),
+                                                    Text(
+                                                      snapshot
+                                                          .data![index].repeat,
+                                                      style: const TextStyle(
+                                                          color: Color.fromARGB(
+                                                              255, 78, 49, 170),
+                                                          fontSize: 13),
+                                                    )
+                                                  ],
                                                 ),
-                                                Text(
-                                                  toDo,
-                                                  style: const TextStyle(
-                                                      color: Color.fromARGB(
+                                                Switch(
+                                                  // This bool value toggles the switch.
+                                                  value: status[index],
+                                                  activeColor:
+                                                      const Color.fromARGB(
                                                           255, 78, 49, 170),
-                                                      fontSize: 13),
-                                                ),
-                                                Text(
-                                                  snapshot.data![index].repeat,
-                                                  style: const TextStyle(
-                                                      color: Color.fromARGB(
-                                                          255, 78, 49, 170),
-                                                      fontSize: 13),
+                                                  onChanged:
+                                                      (bool value) async {
+                                                    setState(() {
+                                                      status[index] = value;
+                                                    });
+                                                    if (status[index] == true) {
+                                                      updateTask(
+                                                          snapshot
+                                                              .data![index].id,
+                                                          'active');
+                                                    } else {
+                                                      updateTask(
+                                                          snapshot
+                                                              .data![index].id,
+                                                          'disabled');
+                                                    }
+                                                    await widget.startService();
+                                                    setState(() {});
+
+                                                    // This is called when the user toggles the switch.
+                                                  },
                                                 )
                                               ],
-                                            )),
-                                        Switch(
-                                          // This bool value toggles the switch.
-                                          value: status[index],
-                                          activeColor: const Color.fromARGB(
-                                              255, 78, 49, 170),
-                                          onChanged: (bool value) {
-                                            // This is called when the user toggles the switch.
-                                            setState(() {
-                                              status[index] = value;
-                                            });
-                                          },
-                                        )
-                                      ],
-                                    )),
+                                            ))),
                                   ]),
                                 );
                               } else {
@@ -242,13 +305,7 @@ class _Tasks extends State<Tasks> {
                                       const EdgeInsets.fromLTRB(30, 3, 30, 3),
                                   child: Column(children: [
                                     Container(
-                                        child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        InkWell(
+                                        child: InkWell(
                                             splashColor: Colors.transparent,
                                             highlightColor: Colors.transparent,
                                             onTap: () {
@@ -260,7 +317,7 @@ class _Tasks extends State<Tasks> {
                                                       title: Text(snapshot
                                                           .data![index].time),
                                                       content: Container(
-                                                        height: 100,
+                                                        height: 90,
                                                         child: Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -286,12 +343,47 @@ class _Tasks extends State<Tasks> {
                                                               height: 4,
                                                               width: 0,
                                                             ),
-                                                            Text(
-                                                                "3 times, Every ${snapshot.data![index].snooze} minutes"),
+                                                            snapshot
+                                                                        .data![
+                                                                            index]
+                                                                        .snooze ==
+                                                                    0
+                                                                ? const Text(
+                                                                    'No repeat')
+                                                                : Text(
+                                                                    "Repeat after ${snapshot.data![index].snooze} minutes"),
                                                           ],
                                                         ),
                                                       ),
                                                       actions: [
+                                                        TextButton(
+                                                            onPressed:
+                                                                () async {
+                                                              setState(() {});
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+
+                                                              handler.deleteTask(
+                                                                  snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .id);
+                                                              await widget
+                                                                  .startService();
+                                                            },
+                                                            child: const Text(
+                                                              'DELETE',
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        78,
+                                                                        49,
+                                                                        170),
+                                                              ),
+                                                            )),
                                                         TextButton(
                                                             onPressed: () {
                                                               Navigator.of(
@@ -301,61 +393,85 @@ class _Tasks extends State<Tasks> {
                                                             child: const Text(
                                                               'OK',
                                                               style: TextStyle(
-                                                                  color: Color
-                                                                      .fromARGB(
-                                                                          255,
-                                                                          78,
-                                                                          49,
-                                                                          170),
-                                                                  fontSize: 17),
+                                                                fontSize: 15,
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        78,
+                                                                        49,
+                                                                        170),
+                                                              ),
                                                             ))
                                                       ],
                                                     );
                                                   });
                                             },
-                                            child: Column(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.center,
                                               children: [
-                                                Text(
-                                                  snapshot.data![index].time,
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 20),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      snapshot
+                                                          .data![index].time,
+                                                      style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 20),
+                                                    ),
+                                                    Text(
+                                                      toDo,
+                                                      style: const TextStyle(
+                                                          color: Color.fromARGB(
+                                                              255, 78, 49, 170),
+                                                          fontSize: 13),
+                                                    ),
+                                                    Text(
+                                                      snapshot
+                                                          .data![index].repeat,
+                                                      style: const TextStyle(
+                                                          color: Color.fromARGB(
+                                                              255, 78, 49, 170),
+                                                          fontSize: 13),
+                                                    )
+                                                  ],
                                                 ),
-                                                Text(
-                                                  toDo,
-                                                  style: const TextStyle(
-                                                      color: Color.fromARGB(
+                                                Switch(
+                                                  // This bool value toggles the switch.
+                                                  value: status[index],
+                                                  activeColor:
+                                                      const Color.fromARGB(
                                                           255, 78, 49, 170),
-                                                      fontSize: 13),
-                                                ),
-                                                Text(
-                                                  snapshot.data![index].repeat,
-                                                  style: const TextStyle(
-                                                      color: Color.fromARGB(
-                                                          255, 78, 49, 170),
-                                                      fontSize: 13),
+                                                  onChanged:
+                                                      (bool value) async {
+                                                    // This is called when the user toggles the switch.
+                                                    setState(() {
+                                                      status[index] = value;
+                                                    });
+                                                    if (status[index] == true) {
+                                                      updateTask(
+                                                          snapshot
+                                                              .data![index].id,
+                                                          'active');
+                                                    } else {
+                                                      updateTask(
+                                                          snapshot
+                                                              .data![index].id,
+                                                          'disabled');
+                                                    }
+                                                    await widget.startService();
+                                                    setState(() {});
+                                                  },
                                                 )
                                               ],
-                                            )),
-                                        Switch(
-                                          // This bool value toggles the switch.
-                                          value: status[index],
-                                          activeColor: const Color.fromARGB(
-                                              255, 78, 49, 170),
-                                          onChanged: (bool value) {
-                                            // This is called when the user toggles the switch.
-                                            setState(() {
-                                              status[index] = value;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    )),
+                                            ))),
                                     const Divider(
-                                      color: Color.fromARGB(255, 78, 49, 170),
-                                    )
+                                        color: Color.fromARGB(255, 78, 49, 170))
                                   ]),
                                 );
                               }

@@ -9,7 +9,7 @@ class DataBase {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze TEXT NOT NULL)",
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze INTEGER)",
         );
         await db.execute(
           "CREATE TABLE gender(gender TEXT NOT NULL, honorific TEXT NOT NULL)",
@@ -31,6 +31,17 @@ class DataBase {
     return result;
   }
 
+  Future<int> updateTask(int id, String status) async {
+    final db = await initializedDB();
+
+    return await db.update(
+      'tasks',
+      {'status': status},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   // retrieve data
   Future<List<UserTask>> retrieveTasks() async {
     final Database db = await initializedDB();
@@ -38,8 +49,8 @@ class DataBase {
         await db.query('tasks', columns: null);
     return queryResult.map((e) => UserTask.fromMap(e)).toList();
   }
-
-  Future<void> updateUserTask(int id, String status) async {
+  /*
+  Future<void> updateUserTask(int? id, String status) async {
     final db = await initializedDB();
     await db.update(
       'tasks',
@@ -49,7 +60,7 @@ class DataBase {
       where: "id = ?",
       whereArgs: [id],
     );
-  }
+  } */
 
   // insert data
   Future<int> insertUserGender(List<Gender> task) async {
@@ -70,7 +81,7 @@ class DataBase {
   }
 
   // delete user
-  Future<void> deleteTask(int id) async {
+  Future<void> deleteTask(int? id) async {
     final db = await initializedDB();
     await db.delete(
       'tasks',
@@ -101,7 +112,7 @@ class UserTask {
   late final String time;
   late final String status;
   late final String repeat;
-  late final String snooze;
+  late final int snooze;
 
   UserTask({
     this.id,
