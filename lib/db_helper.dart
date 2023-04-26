@@ -9,7 +9,7 @@ class DataBase {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze INTEGER)",
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze INTEGER, reminded INTEGER)",
         );
         await db.execute(
           "CREATE TABLE gender(gender TEXT NOT NULL, honorific TEXT NOT NULL)",
@@ -31,7 +31,7 @@ class DataBase {
     return result;
   }
 
-  Future<int> updateTask(int id, String status) async {
+  Future<int> updateTaskStatus(int id, String status) async {
     final db = await initializedDB();
 
     return await db.update(
@@ -42,25 +42,24 @@ class DataBase {
     );
   }
 
+  Future<int> reminded(int id) async {
+    final db = await initializedDB();
+
+    return await db.update(
+      'tasks',
+      {'reminded': 1},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   // retrieve data
   Future<List<UserTask>> retrieveTasks() async {
     final Database db = await initializedDB();
     final List<Map<String, Object?>> queryResult =
-        await db.query('tasks', columns: null);
+        await db.query('tasks', columns: null, orderBy: 'id DESC');
     return queryResult.map((e) => UserTask.fromMap(e)).toList();
   }
-  /*
-  Future<void> updateUserTask(int? id, String status) async {
-    final db = await initializedDB();
-    await db.update(
-      'tasks',
-      {
-        'status': status,
-      },
-      where: "id = ?",
-      whereArgs: [id],
-    );
-  } */
 
   // insert data
   Future<int> insertUserGender(List<Gender> task) async {
@@ -113,6 +112,7 @@ class UserTask {
   late final String status;
   late final String repeat;
   late final int snooze;
+  late final int reminded;
 
   UserTask({
     this.id,
@@ -121,6 +121,7 @@ class UserTask {
     required this.status,
     required this.repeat,
     required this.snooze,
+    required this.reminded,
   });
 
   UserTask.fromMap(Map<String, dynamic> result)
@@ -129,7 +130,8 @@ class UserTask {
         time = result["time"],
         status = result["status"],
         repeat = result['repeat'],
-        snooze = result['snooze'];
+        snooze = result['snooze'],
+        reminded = result['reminded'];
 
   Map<String, Object?> toMap() {
     return {
@@ -139,6 +141,7 @@ class UserTask {
       'status': status,
       'repeat': repeat,
       'snooze': snooze,
+      'reminded': reminded,
     };
   }
 }

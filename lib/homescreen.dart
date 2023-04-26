@@ -24,17 +24,23 @@ class Task {
   DateTime date;
   String task;
   String honorific;
-  bool status;
+  String status;
   int snooze;
 
   Task(this.id, this.time, this.date, this.task, this.honorific, this.status,
       this.snooze);
 }
 
+class ScheduledTasksList {
+  ScheduledTask task;
+  String status;
+  String id;
+  ScheduledTasksList(this.id, this.task, this.status);
+}
+
 class _HomeScreen extends State<HomeScreen> {
   final now = DateTime.now();
-  //map tasks
-
+  List<ScheduledTasksList> tasks = [];
   bool speaking = true;
 
   @override
@@ -49,13 +55,18 @@ class _HomeScreen extends State<HomeScreen> {
     handler = DataBase();
     handler.initializedDB();
     //fetch honorific
-    handler.getUserGender().then((value) {
+    await handler.getUserGender().then((value) {
       setState(() {
         userHonorific = value[0].honorific;
       });
     });
-    handler.retrieveTasks().then((value) {
+    await handler.retrieveTasks().then((value) {
       if (value.isNotEmpty) {
+        //
+        for (int j = 0; j < tasks.length; j++) {
+          tasks[j].task.cancel();
+        }
+        tasks.clear();
         List<Task> timeList = [];
         for (int i = 0; i < value.length; i++) {
           String weekday;
@@ -81,7 +92,7 @@ class _HomeScreen extends State<HomeScreen> {
                     DateFormat('hh:mm a').parse(value[i].time.toString()),
                     value[i].task,
                     userHonorific,
-                    true,
+                    'active',
                     value[i].snooze));
               } else {
                 timeList.add(Task(
@@ -90,84 +101,102 @@ class _HomeScreen extends State<HomeScreen> {
                     DateFormat('hh:mm a').parse(value[i].time.toString()),
                     value[i].task,
                     userHonorific,
-                    false,
+                    'disabled',
                     value[i].snooze));
               }
             }
           }
         }
         if (timeList.isNotEmpty) {
-          timeList.sort((a, b) => a.date.compareTo(b.date));
+          var cron = Cron();
+          // timeList.sort((a, b) => a.date.compareTo(b.date));
           for (int i = 0; i < timeList.length; i++) {
-            var cron = Cron();
-            if (timeList[i].status == true) {
-              cron.schedule(
-                Schedule.parse(
-                    '${timeList[i].date.minute} ${timeList[i].date.hour} * * *'),
-                () async {
-                  AwesomeNotifications().initialize(
-                    null,
-                    [
-                      NotificationChannel(
-                        channelKey: 'key$i',
-                        channelName: 'Channel Name',
-                        channelDescription: 'Channel Description',
-                        importance: NotificationImportance.High,
-                      )
-                    ],
-                  );
-                  AwesomeNotifications().createNotification(
-                    content: NotificationContent(
-                        id: i,
-                        channelKey: 'key$i',
-                        title: 'Hello, Sir!',
-                        body: 'It is time to do your task.',
-                        wakeUpScreen: true,
-                        criticalAlert: true,
-                        fullScreenIntent: true),
-                    actionButtons: [
-                      NotificationActionButton(
-                        color: Colors.blue,
-                        key: 'snooze',
-                        label: 'Snooze',
-                        buttonType: ActionButtonType.Default,
-                      ),
-                      NotificationActionButton(
-                        color: Colors.blue,
-                        key: 'dismiss',
-                        label: 'Dismiss',
-                        buttonType: ActionButtonType.Default,
-                      ),
-                    ],
-                  );
+            var task = cron.schedule(
+              Schedule.parse(
+                  '${timeList[i].date.minute} ${timeList[i].date.hour} * * *'),
+              () async {
+                AwesomeNotifications().initialize(
+                  null,
+                  [
+                    NotificationChannel(
+                      channelKey: 'key1',
+                      channelName: 'Channel Name',
+                      channelDescription: 'Channel Description',
+                      importance: NotificationImportance.High,
+                    )
+                  ],
+                );
+                AwesomeNotifications()
+                    .isNotificationAllowed()
+                    .then((isAllowed) {
+                  if (!isAllowed) {
+                    AwesomeNotifications()
+                        .requestPermissionToSendNotifications();
+                  }
+                });
+                AwesomeNotifications().createNotification(
+                  content: NotificationContent(
+                      id: i,
+                      channelKey: 'key1',
+                      title: 'Hello, Sir!',
+                      body: 'It is time to do your task.',
+                      wakeUpScreen: true,
+                      criticalAlert: true,
+                      fullScreenIntent: true),
+                  actionButtons: [
+                    NotificationActionButton(
+                      color: Colors.blue,
+                      key: 'snooze',
+                      label: 'Snooze',
+                      buttonType: ActionButtonType.Default,
+                    ),
+                    NotificationActionButton(
+                      color: Colors.blue,
+                      key: 'dismiss',
+                      label: 'Dismiss',
+                      buttonType: ActionButtonType.Default,
+                    ),
+                  ],
+                );
 
-                  var initializationSettingsAndroid =
-                      const AndroidInitializationSettings(
-                          '@mipmap/launcher_icon');
-                  var initializationSettingsIOS =
-                      const IOSInitializationSettings();
-                  var initializationSettings = InitializationSettings(
-                      android: initializationSettingsAndroid,
-                      iOS: initializationSettingsIOS);
-                  flutterlocalNotificationPlugin =
-                      FlutterLocalNotificationsPlugin();
-                  await flutterlocalNotificationPlugin!
-                      .initialize(initializationSettings,
-                          onSelectNotification: (String? payload) async {
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Speech(
-                                  task: timeList[i].task,
-                                  time: timeList[i].time,
-                                  honorific: timeList[i].honorific,
-                                  len: timeList.length,
-                                  startservice: initState,
-                                  snooze: timeList[i].snooze,
-                                )));
-                  });
-                },
-              );
+                var initializationSettingsAndroid =
+                    const AndroidInitializationSettings(
+                        '@mipmap/launcher_icon');
+                var initializationSettingsIOS =
+                    const IOSInitializationSettings();
+                var initializationSettings = InitializationSettings(
+                    android: initializationSettingsAndroid,
+                    iOS: initializationSettingsIOS);
+                flutterlocalNotificationPlugin =
+                    FlutterLocalNotificationsPlugin();
+                await flutterlocalNotificationPlugin!
+                    .initialize(initializationSettings,
+                        onSelectNotification: (String? payload) async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Speech(
+                                task: timeList[i].task,
+                                time: timeList[i].time,
+                                honorific: timeList[i].honorific,
+                                len: timeList.length,
+                                startservice: initState,
+                                snooze: timeList[i].snooze,
+                              )));
+                });
+                await handler.reminded(int.parse(timeList[i].id));
+              },
+            );
+            if (timeList[i].status == 'active') {
+              tasks.add(ScheduledTasksList(timeList[i].id, task, 'active'));
+            } else {
+              tasks.add(ScheduledTasksList(timeList[i].id, task, 'disabled'));
+            }
+          }
+
+          for (int j = 0; j < tasks.length; j++) {
+            if (tasks[j].status == 'disabled') {
+              tasks[j].task.cancel();
             }
           }
         }
@@ -231,7 +260,7 @@ class _HomeScreen extends State<HomeScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) =>
+                      builder: (context) =>
                           SetAlarm(startService: startService)));
             },
             child: Container(
@@ -271,8 +300,7 @@ class _HomeScreen extends State<HomeScreen> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            Tasks(startService: startService)));
+                        builder: (context) => Tasks(start: startService)));
               },
               child: Container(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),

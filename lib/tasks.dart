@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:taskreminder/db_helper.dart';
 
 class Tasks extends StatefulWidget {
-  final Function startService;
+  final Function start;
 
-  const Tasks({Key? key, required this.startService}) : super(key: key);
+  const Tasks({Key? key, required this.start}) : super(key: key);
 
   @override
   _Tasks createState() => _Tasks();
@@ -15,8 +15,7 @@ class _Tasks extends State<Tasks> {
   List<bool> status = [];
 
   void updateTask(id, status) async {
-    await handler.updateTask(id, status);
-    await widget.startService();
+    await handler.updateTaskStatus(id, status);
   }
 
   @override
@@ -173,10 +172,10 @@ class _Tasks extends State<Tasks> {
                                                                             index]
                                                                         .snooze ==
                                                                     0
-                                                                ? Text(
+                                                                ? const Text(
                                                                     'No repeat')
                                                                 : Text(
-                                                                    "Repeat after ${snapshot.data![index].snooze} minutes")
+                                                                    "Repeat after ${snapshot.data![index].snooze} minutes"),
                                                           ],
                                                         ),
                                                       ),
@@ -196,7 +195,7 @@ class _Tasks extends State<Tasks> {
                                                                               index]
                                                                           .id);
                                                               await widget
-                                                                  .startService();
+                                                                  .start();
                                                             },
                                                             child: const Text(
                                                               'DELETE',
@@ -273,8 +272,7 @@ class _Tasks extends State<Tasks> {
                                                   activeColor:
                                                       const Color.fromARGB(
                                                           255, 78, 49, 170),
-                                                  onChanged:
-                                                      (bool value) async {
+                                                  onChanged: (bool value) {
                                                     setState(() {
                                                       status[index] = value;
                                                     });
@@ -289,8 +287,7 @@ class _Tasks extends State<Tasks> {
                                                               .data![index].id,
                                                           'disabled');
                                                     }
-                                                    await widget.startService();
-                                                    setState(() {});
+                                                    widget.start();
 
                                                     // This is called when the user toggles the switch.
                                                   },
@@ -370,7 +367,7 @@ class _Tasks extends State<Tasks> {
                                                                           index]
                                                                       .id);
                                                               await widget
-                                                                  .startService();
+                                                                  .start();
                                                             },
                                                             child: const Text(
                                                               'DELETE',
@@ -447,8 +444,7 @@ class _Tasks extends State<Tasks> {
                                                   activeColor:
                                                       const Color.fromARGB(
                                                           255, 78, 49, 170),
-                                                  onChanged:
-                                                      (bool value) async {
+                                                  onChanged: (bool value) {
                                                     // This is called when the user toggles the switch.
                                                     setState(() {
                                                       status[index] = value;
@@ -464,8 +460,7 @@ class _Tasks extends State<Tasks> {
                                                               .data![index].id,
                                                           'disabled');
                                                     }
-                                                    await widget.startService();
-                                                    setState(() {});
+                                                    widget.start();
                                                   },
                                                 )
                                               ],

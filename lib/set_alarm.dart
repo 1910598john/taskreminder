@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:day_picker/day_picker.dart';
 import 'package:taskreminder/db_helper.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'dart:math';
+
+FlutterTts flutterTts = FlutterTts();
 
 class SetAlarm extends StatefulWidget {
   final Function startService;
@@ -19,6 +23,7 @@ class _SetAlarm extends State<SetAlarm> {
   Future<int> insertTask(task, time, weekday, snooze) async {
     String repeat = "Remind, ";
     String status = 'active';
+    int reminded = 0;
     if (weekdays_list.isNotEmpty) {
       for (int i = 0; i < weekdays_list.length; i++) {
         repeat += "${weekdays_list[i]} ";
@@ -27,7 +32,12 @@ class _SetAlarm extends State<SetAlarm> {
       repeat = "Only once";
     }
     UserTask data = UserTask(
-        task: task, time: time, status: status, repeat: repeat, snooze: snooze);
+        task: task,
+        time: time,
+        status: status,
+        repeat: repeat,
+        snooze: snooze,
+        reminded: 0);
     List<UserTask> list = [data];
     return await handler.insertTask(list);
   }
@@ -41,6 +51,24 @@ class _SetAlarm extends State<SetAlarm> {
     super.initState();
     handler = DataBase();
     handler.initializedDB();
+  }
+
+  //textfield tts assistant
+  void speak() async {
+    List<String> errorMessages = [
+      "You haven't entered your task yet.",
+      "Textfield must be filled out.",
+      "You haven't entered anything in the textfield.",
+      "Please fill out the textfield.",
+      "Please enter your task in the textfield."
+    ];
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(.3);
+    await flutterTts.setSpeechRate(0.5);
+
+    await flutterTts
+        .speak(errorMessages[Random().nextInt(errorMessages.length)]);
+    await flutterTts.awaitSpeakCompletion(true);
   }
 
   String pickedTime = '';
@@ -447,40 +475,84 @@ class _SetAlarm extends State<SetAlarm> {
                   foregroundColor: Colors.white,
                   fixedSize: const Size(150, 50),
                 ),
-                onPressed: () async {
+                onPressed: () {
                   if (task.text.isNotEmpty) {
-                    String weekday = '';
-                    for (int i = 0; i < weekdays_list.length; i++) {
-                      if (weekdays_list[i] == 'Sun') {
-                        weekday += '0';
-                      } else if (weekdays_list[i] == 'Mon') {
-                        weekday += '1';
-                      } else if (weekdays_list[i] == 'Tue') {
-                        weekday += '2';
-                      } else if (weekdays_list[i] == 'Wed') {
-                        weekday += '3';
-                      } else if (weekdays_list[i] == 'Thu') {
-                        weekday += '4';
-                      } else if (weekdays_list[i] == 'Fri') {
-                        weekday += '5';
-                      } else if (weekdays_list[i] == 'Sat') {
-                        weekday += '6';
-                      }
-                    }
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Confirmation'),
+                            content: Container(
+                                width: 250,
+                                child: Text(
+                                    'Do you wish this app to remind you on your task on $pickedTime?')),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    'CANCEL',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Color.fromARGB(255, 78, 49, 170),
+                                    ),
+                                  )),
+                              TextButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                    if (task.text.isNotEmpty) {
+                                      String weekday = '';
+                                      for (int i = 0;
+                                          i < weekdays_list.length;
+                                          i++) {
+                                        if (weekdays_list[i] == 'Sun') {
+                                          weekday += '0';
+                                        } else if (weekdays_list[i] == 'Mon') {
+                                          weekday += '1';
+                                        } else if (weekdays_list[i] == 'Tue') {
+                                          weekday += '2';
+                                        } else if (weekdays_list[i] == 'Wed') {
+                                          weekday += '3';
+                                        } else if (weekdays_list[i] == 'Thu') {
+                                          weekday += '4';
+                                        } else if (weekdays_list[i] == 'Fri') {
+                                          weekday += '5';
+                                        } else if (weekdays_list[i] == 'Sat') {
+                                          weekday += '6';
+                                        }
+                                      }
 
-                    if (snooze == true) {
-                      await insertTask(task.text, pickedTime, weekday, repeat);
-                    } else {
-                      await insertTask(task.text, pickedTime, weekday, 0);
-                    }
+                                      if (snooze == true) {
+                                        insertTask(task.text, pickedTime,
+                                            weekday, repeat);
+                                      } else {
+                                        insertTask(
+                                            task.text, pickedTime, weekday, 0);
+                                      }
 
-                    await widget.startService();
-                    setState(() {
-                      weekdays.forEach((element) {
-                        element.isSelected = false;
-                      });
-                      task.text = "";
-                    });
+                                      widget.startService();
+                                      setState(() {
+                                        weekdays.forEach((element) {
+                                          element.isSelected = false;
+                                        });
+                                        task.text = "";
+                                      });
+                                    }
+                                  },
+                                  child: const Text(
+                                    'YES',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Color.fromARGB(255, 78, 49, 170),
+                                    ),
+                                  ))
+                            ],
+                          );
+                        });
+                  } else {
+                    speak();
                   }
                 },
                 child: const Text(

@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-import 'package:dropdown_textfield/dropdown_textfield.dart';
-import 'package:day_picker/day_picker.dart';
-import 'main.dart';
+import 'package:taskreminder/db_helper.dart';
 
 class History extends StatefulWidget {
   const History({Key? key}) : super(key: key);
@@ -13,7 +9,8 @@ class History extends StatefulWidget {
 }
 
 class _History extends State<History> {
-  int itemcount = 10;
+  late DataBase handler;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +28,7 @@ class _History extends State<History> {
       body: Column(children: [
         Container(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
-          child: Column(children: [
+          child: Column(children: const [
             Icon(
               Icons.history,
               size: 100,
@@ -71,221 +68,168 @@ class _History extends State<History> {
           ]),
         ),
         const Divider(),
-        Expanded(
-            child: Container(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(30, 3, 30, 3),
-                      child: Column(children: [
-                        Container(
-                            child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '1:00 PM',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                ),
-                                Text(
-                                  'Faculty meeting',
-                                  style: TextStyle(
-                                      color: Color.fromARGB(255, 78, 49, 170),
-                                      fontSize: 13),
-                                ),
-                                Text(
-                                  "Only once",
-                                  style: const TextStyle(
-                                      color: Color.fromARGB(255, 78, 49, 170),
-                                      fontSize: 13),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.delete_sharp,
-                                  color: Color.fromARGB(255, 78, 49, 170),
-                                  size: 30,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                  height: 0,
-                                ),
-                                Icon(
-                                  Icons.repeat,
-                                  color: Color.fromARGB(255, 78, 49, 170),
-                                  size: 30,
-                                ),
-                              ],
-                            )
-                          ],
-                        )),
-                        Divider(
-                          color: Color.fromARGB(255, 78, 49, 170),
-                        )
-                      ]),
+        FutureBuilder(
+            future: handler.retrieveTasks(),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<UserTask>> snapshot) {
+              if (snapshot.data!.isEmpty) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    SizedBox(
+                      height: 200,
+                      width: 0,
                     ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(30, 3, 30, 3),
-                      child: Column(children: [
-                        Container(
-                            child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '2:00 PM',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                ),
-                                Text(
-                                  "Make a lesson plan",
-                                  style: const TextStyle(
-                                      color: Color.fromARGB(255, 78, 49, 170),
-                                      fontSize: 13),
-                                ),
-                                Text(
-                                  'Remind, Mon Wed Fri',
-                                  style: TextStyle(
-                                      color: Color.fromARGB(255, 78, 49, 170),
-                                      fontSize: 13),
-                                )
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.delete_sharp,
-                                  color: Color.fromARGB(255, 78, 49, 170),
-                                  size: 30,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                  height: 0,
-                                ),
-                                Icon(
-                                  Icons.repeat,
-                                  color: Color.fromARGB(255, 78, 49, 170),
-                                  size: 30,
-                                ),
-                              ],
-                            )
-                          ],
-                        )),
-                      ]),
-                    )
+                    Text(
+                      'No item',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Color.fromARGB(255, 78, 49, 170),
+                      ),
+                    ),
                   ],
-                ))),
+                );
+              } else {
+                return Expanded(
+                    child: Container(
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              if (index == (snapshot.data!.length - 1)) {
+                                return Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(30, 3, 30, 3),
+                                  child: Column(children: [
+                                    Container(
+                                        child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              snapshot.data![index].time,
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20),
+                                            ),
+                                            Text(
+                                              snapshot.data![index].task,
+                                              style: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 78, 49, 170),
+                                                  fontSize: 13),
+                                            ),
+                                            Text(
+                                              snapshot.data![index].repeat,
+                                              style: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 78, 49, 170),
+                                                  fontSize: 13),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          children: const [
+                                            Icon(
+                                              Icons.delete_sharp,
+                                              color: Color.fromARGB(
+                                                  255, 78, 49, 170),
+                                              size: 30,
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                              height: 0,
+                                            ),
+                                            Icon(
+                                              Icons.repeat,
+                                              color: Color.fromARGB(
+                                                  255, 78, 49, 170),
+                                              size: 30,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    )),
+                                  ]),
+                                );
+                              } else {
+                                return Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(30, 3, 30, 3),
+                                  child: Column(children: [
+                                    Container(
+                                        child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              snapshot.data![index].time,
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20),
+                                            ),
+                                            Text(
+                                              snapshot.data![index].task,
+                                              style: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 78, 49, 170),
+                                                  fontSize: 13),
+                                            ),
+                                            Text(
+                                              snapshot.data![index].repeat,
+                                              style: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 78, 49, 170),
+                                                  fontSize: 13),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: const [
+                                            Icon(
+                                              Icons.delete_sharp,
+                                              color: Color.fromARGB(
+                                                  255, 78, 49, 170),
+                                              size: 30,
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                              height: 0,
+                                            ),
+                                            Icon(
+                                              Icons.repeat,
+                                              color: Color.fromARGB(
+                                                  255, 78, 49, 170),
+                                              size: 30,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    )),
+                                    const Divider(
+                                      color: Color.fromARGB(255, 78, 49, 170),
+                                    )
+                                  ]),
+                                );
+                              }
+                            })));
+              }
+            })
       ]),
     );
   }
-  /*
-  test(index) {
-    if (index == (itemcount - 1)) {
-      return Container(
-        padding: const EdgeInsets.fromLTRB(30, 3, 30, 3),
-        child: Column(children: [
-          Container(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '7:30 AM',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  Text(
-                    'Eat breakfast',
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 78, 49, 170), fontSize: 13),
-                  )
-                ],
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.delete_sharp,
-                    color: Color.fromARGB(255, 78, 49, 170),
-                    size: 30,
-                  ),
-                  SizedBox(
-                    width: 5,
-                    height: 0,
-                  ),
-                  Icon(
-                    Icons.repeat,
-                    color: Color.fromARGB(255, 78, 49, 170),
-                    size: 30,
-                  ),
-                ],
-              )
-            ],
-          )),
-        ]),
-      );
-    } else {
-      return Container(
-        padding: const EdgeInsets.fromLTRB(30, 3, 30, 3),
-        child: Column(children: [
-          Container(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '7:30 AM',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  Text(
-                    'Eat breakfast',
-                    style: TextStyle(
-                        color: Color.fromARGB(255, 78, 49, 170), fontSize: 13),
-                  )
-                ],
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.delete_sharp,
-                    color: Color.fromARGB(255, 78, 49, 170),
-                    size: 30,
-                  ),
-                  SizedBox(
-                    width: 5,
-                    height: 0,
-                  ),
-                  Icon(
-                    Icons.repeat,
-                    color: Color.fromARGB(255, 78, 49, 170),
-                    size: 30,
-                  ),
-                ],
-              )
-            ],
-          )),
-          Divider(
-            color: Color.fromARGB(255, 78, 49, 170),
-          )
-        ]),
-      );
-    }
-  }
-
-  buildTaskList(int index) => test(index);
-  */
 }
