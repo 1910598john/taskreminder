@@ -9,7 +9,6 @@ class Speech extends StatefulWidget {
   final String time;
   final String honorific;
   final Function startservice;
-  final int len;
   final int snooze;
   const Speech(
       {Key? key,
@@ -17,7 +16,6 @@ class Speech extends StatefulWidget {
       required this.time,
       required this.honorific,
       required this.startservice,
-      required this.len,
       required this.snooze})
       : super(key: key);
 

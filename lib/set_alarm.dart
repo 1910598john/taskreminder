@@ -37,7 +37,7 @@ class _SetAlarm extends State<SetAlarm> {
         status: status,
         repeat: repeat,
         snooze: snooze,
-        reminded: 0);
+        reminded: reminded);
     List<UserTask> list = [data];
     return await handler.insertTask(list);
   }

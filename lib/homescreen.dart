@@ -50,7 +50,6 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    startService();
     AwesomeNotifications().initialize(
       'resource://mipmap/launcher_icon',
       [
@@ -67,6 +66,7 @@ class _HomeScreen extends State<HomeScreen> {
         AwesomeNotifications().requestPermissionToSendNotifications();
       }
     });
+    startService();
   }
 
   void speak(honorific, task) async {
@@ -204,11 +204,29 @@ class _HomeScreen extends State<HomeScreen> {
                                 task: timeList[i].task,
                                 time: timeList[i].time,
                                 honorific: timeList[i].honorific,
-                                len: timeList.length,
                                 startservice: initState,
                                 snooze: timeList[i].snooze,
                               )));
                 });
+
+                var androidPlatformChannelSpecifics =
+                    const AndroidNotificationDetails(
+                        '1', 'channelName', 'channel_description',
+                        importance: Importance.max,
+                        priority: Priority.high,
+                        ticker: 'ticker');
+                var iOSPlatformChannelSpecifics =
+                    const IOSNotificationDetails();
+                var platformChannelSpecifics = NotificationDetails(
+                    android: androidPlatformChannelSpecifics,
+                    iOS: iOSPlatformChannelSpecifics);
+
+                await flutterlocalNotificationPlugin!.show(
+                    1,
+                    'Hello, ${timeList[i].honorific}!',
+                    'It is time to do your task.',
+                    platformChannelSpecifics);
+
                 speak(timeList[i].honorific, timeList[i].task);
                 await handler.isReminded(int.parse(timeList[i].id));
               },
