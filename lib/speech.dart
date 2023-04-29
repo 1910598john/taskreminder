@@ -2,12 +2,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'homescreen.dart';
-import 'package:volume_control/volume_control.dart';
-
-FlutterTts flutterTts = FlutterTts();
-bool? running;
 
 class Speech extends StatefulWidget {
   final String task;
@@ -35,32 +30,6 @@ class _Speech extends State<Speech> {
   void initState() {
     super.initState();
     Wakelock.enable();
-    speak();
-    setVolume();
-  }
-
-  void speak() async {
-    setState(() {
-      running = true;
-    });
-    await flutterTts.setLanguage("en-US");
-    await flutterTts.setPitch(.3);
-    await flutterTts.setSpeechRate(0.5);
-    while (running!) {
-      await flutterTts
-          .speak("${widget.honorific}, It is time for you to ${widget.task}");
-      await flutterTts.awaitSpeakCompletion(true);
-      Future.delayed(const Duration(seconds: 8));
-    }
-  }
-
-  void setVolume() async {
-    // Get the current volume, min=0, max=1
-    double _val = await VolumeControl.volume;
-
-    if (_val <= 0.4) {
-      VolumeControl.setVolume(0.7);
-    }
   }
 
   @override
@@ -160,12 +129,7 @@ class _Speech extends State<Speech> {
                                         fixedSize: Size(120, 40),
                                       ),
                                       onPressed: () async {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        const HomeScreen()));
+                                        SystemNavigator.pop();
                                         setState(() {
                                           running = false;
                                         });
@@ -188,12 +152,7 @@ class _Speech extends State<Speech> {
                                               Color.fromRGBO(255, 255, 255, 1),
                                           fixedSize: Size(120, 40)),
                                       onPressed: () async {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        const HomeScreen()));
+                                        SystemNavigator.pop();
                                         setState(() {
                                           running = false;
                                         });

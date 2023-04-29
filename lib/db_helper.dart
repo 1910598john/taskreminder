@@ -42,7 +42,7 @@ class DataBase {
     );
   }
 
-  Future<int> reminded(int id) async {
+  Future<int> isReminded(int id) async {
     final db = await initializedDB();
 
     return await db.update(

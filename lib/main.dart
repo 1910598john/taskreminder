@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'gender.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 

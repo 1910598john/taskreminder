@@ -8,8 +8,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'speech.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:volume_control/volume_control.dart';
 
+FlutterTts flutterTts = FlutterTts();
 FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
+bool? running;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -47,6 +51,46 @@ class _HomeScreen extends State<HomeScreen> {
   void initState() {
     super.initState();
     startService();
+    AwesomeNotifications().initialize(
+      'resource://mipmap/launcher_icon',
+      [
+        NotificationChannel(
+          channelKey: 'key1',
+          channelName: 'Channel Name',
+          channelDescription: 'Channel Description',
+          importance: NotificationImportance.High,
+        )
+      ],
+    );
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
+  }
+
+  void speak(honorific, task) async {
+    setState(() {
+      running = true;
+    });
+    setVolume();
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(.3);
+    await flutterTts.setSpeechRate(0.5);
+    while (running!) {
+      await flutterTts.speak("$honorific, It is time for you to $task");
+      await flutterTts.awaitSpeakCompletion(true);
+      Future.delayed(const Duration(seconds: 8));
+    }
+  }
+
+  void setVolume() async {
+    // Get the current volume, min=0, max=1
+    double _val = await VolumeControl.volume;
+
+    if (_val <= 0.4) {
+      VolumeControl.setVolume(0.7);
+    }
   }
 
   void startService() async {
@@ -115,30 +159,11 @@ class _HomeScreen extends State<HomeScreen> {
               Schedule.parse(
                   '${timeList[i].date.minute} ${timeList[i].date.hour} * * *'),
               () async {
-                AwesomeNotifications().initialize(
-                  null,
-                  [
-                    NotificationChannel(
-                      channelKey: 'key1',
-                      channelName: 'Channel Name',
-                      channelDescription: 'Channel Description',
-                      importance: NotificationImportance.High,
-                    )
-                  ],
-                );
-                AwesomeNotifications()
-                    .isNotificationAllowed()
-                    .then((isAllowed) {
-                  if (!isAllowed) {
-                    AwesomeNotifications()
-                        .requestPermissionToSendNotifications();
-                  }
-                });
                 AwesomeNotifications().createNotification(
                   content: NotificationContent(
                       id: i,
                       channelKey: 'key1',
-                      title: 'Hello, Sir!',
+                      title: 'Hello, ${timeList[i].honorific}!',
                       body: 'It is time to do your task.',
                       wakeUpScreen: true,
                       criticalAlert: true,
@@ -184,7 +209,8 @@ class _HomeScreen extends State<HomeScreen> {
                                 snooze: timeList[i].snooze,
                               )));
                 });
-                await handler.reminded(int.parse(timeList[i].id));
+                speak(timeList[i].honorific, timeList[i].task);
+                await handler.isReminded(int.parse(timeList[i].id));
               },
             );
             if (timeList[i].status == 'active') {
@@ -335,10 +361,8 @@ class _HomeScreen extends State<HomeScreen> {
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => const History()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const History()));
               },
               child: Container(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),

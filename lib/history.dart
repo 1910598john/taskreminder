@@ -12,6 +12,13 @@ class _History extends State<History> {
   late DataBase handler;
 
   @override
+  void initState() {
+    super.initState();
+    handler = DataBase();
+    handler.initializedDB();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -72,7 +79,19 @@ class _History extends State<History> {
             future: handler.retrieveTasks(),
             builder:
                 (BuildContext context, AsyncSnapshot<List<UserTask>> snapshot) {
-              if (snapshot.data!.isEmpty) {
+              List<UserTask> lst = [];
+              for (int i = 0; i < snapshot.data!.length; i++) {
+                if (snapshot.data![i].reminded == 1) {
+                  lst.add(UserTask(
+                      task: snapshot.data![i].task,
+                      time: snapshot.data![i].time,
+                      status: snapshot.data![i].status,
+                      repeat: snapshot.data![i].repeat,
+                      snooze: snapshot.data![i].snooze,
+                      reminded: snapshot.data![i].reminded));
+                }
+              }
+              if (lst.isEmpty) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -96,9 +115,9 @@ class _History extends State<History> {
                         child: ListView.builder(
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              if (index == (snapshot.data!.length - 1)) {
+                            itemCount: lst.length,
+                            itemBuilder: ((context, index) {
+                              if (index == (lst.length - 1)) {
                                 return Container(
                                   padding:
                                       const EdgeInsets.fromLTRB(30, 3, 30, 3),
@@ -115,20 +134,20 @@ class _History extends State<History> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              snapshot.data![index].time,
+                                              lst[index].time,
                                               style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 20),
                                             ),
                                             Text(
-                                              snapshot.data![index].task,
+                                              lst[index].task,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
                                                   fontSize: 13),
                                             ),
                                             Text(
-                                              snapshot.data![index].repeat,
+                                              lst[index].repeat,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
@@ -177,20 +196,20 @@ class _History extends State<History> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              snapshot.data![index].time,
+                                              lst[index].time,
                                               style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 20),
                                             ),
                                             Text(
-                                              snapshot.data![index].task,
+                                              lst[index].task,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
                                                   fontSize: 13),
                                             ),
                                             Text(
-                                              snapshot.data![index].repeat,
+                                              lst[index].repeat,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
@@ -226,7 +245,7 @@ class _History extends State<History> {
                                   ]),
                                 );
                               }
-                            })));
+                            }))));
               }
             })
       ]),
