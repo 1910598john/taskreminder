@@ -23,7 +23,6 @@ class _SetAlarm extends State<SetAlarm> {
   Future<int> insertTask(task, time, weekday, snooze) async {
     String repeat = "Remind, ";
     String status = 'active';
-    int reminded = 0;
     if (weekdays_list.isNotEmpty) {
       for (int i = 0; i < weekdays_list.length; i++) {
         repeat += "${weekdays_list[i]} ";
@@ -37,7 +36,8 @@ class _SetAlarm extends State<SetAlarm> {
         status: status,
         repeat: repeat,
         snooze: snooze,
-        reminded: reminded);
+        reminded: 0,
+        snoozeMinutes: 0);
     List<UserTask> list = [data];
     return await handler.insertTask(list);
   }

@@ -131,13 +131,14 @@ class _HomeScreen extends State<HomeScreen> {
             if (!(elapsedTime.compareTo(const Duration(seconds: 1)) >= 0)) {
               if (value[i].status == 'active') {
                 timeList.add(Task(
-                    "${value[i].id}",
-                    value[i].time,
-                    DateFormat('hh:mm a').parse(value[i].time.toString()),
-                    value[i].task,
-                    userHonorific,
-                    'active',
-                    value[i].snooze));
+                  "${value[i].id}",
+                  value[i].time,
+                  DateFormat('hh:mm a').parse(value[i].time.toString()),
+                  value[i].task,
+                  userHonorific,
+                  'active',
+                  value[i].snooze,
+                ));
               } else {
                 timeList.add(Task(
                     "${value[i].id}",
@@ -225,8 +226,8 @@ class _HomeScreen extends State<HomeScreen> {
                     1,
                     'Hello, ${timeList[i].honorific}!',
                     'It is time to do your task.',
-                    platformChannelSpecifics);
-
+                    platformChannelSpecifics,
+                    payload: 'item x');
                 speak(timeList[i].honorific, timeList[i].task);
                 await handler.isReminded(int.parse(timeList[i].id));
               },
