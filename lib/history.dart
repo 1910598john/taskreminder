@@ -89,7 +89,8 @@ class _History extends State<History> {
                       repeat: snapshot.data![i].repeat,
                       snooze: snapshot.data![i].snooze,
                       reminded: snapshot.data![i].reminded,
-                      snoozeMinutes: snapshot.data![i].snoozeMinutes));
+                      snooze_minutes: snapshot.data![i].snooze_minutes,
+                      snooze_triggered: snapshot.data![i].snooze_triggered));
                 }
               }
               if (lst.isEmpty) {

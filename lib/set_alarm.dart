@@ -31,13 +31,15 @@ class _SetAlarm extends State<SetAlarm> {
       repeat = "Only once";
     }
     UserTask data = UserTask(
-        task: task,
-        time: time,
-        status: status,
-        repeat: repeat,
-        snooze: snooze,
-        reminded: 0,
-        snoozeMinutes: 0);
+      task: task,
+      time: time,
+      status: status,
+      repeat: repeat,
+      snooze: snooze,
+      reminded: 0,
+      snooze_minutes: 0,
+      snooze_triggered: 0
+    );
     List<UserTask> list = [data];
     return await handler.insertTask(list);
   }

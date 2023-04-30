@@ -9,7 +9,7 @@ class DataBase {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze INTEGER, reminded INTEGER, snooze_minutes INTEGER)",
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze INTEGER, reminded INTEGER, snooze_minutes INTEGER, snooze_triggered INTEGER)",
         );
         await db.execute(
           "CREATE TABLE gender(gender TEXT NOT NULL, honorific TEXT NOT NULL)",
@@ -124,7 +124,8 @@ class UserTask {
   late final String repeat;
   late final int snooze;
   late final int reminded;
-  late final int snoozeMinutes;
+  late final int snooze_minutes;
+  late final int snooze_triggered;
 
   UserTask({
     this.id,
@@ -134,7 +135,8 @@ class UserTask {
     required this.repeat,
     required this.snooze,
     required this.reminded,
-    required this.snoozeMinutes,
+    required this.snooze_minutes,
+    required this.snooze_triggered,
   });
 
   UserTask.fromMap(Map<String, dynamic> result)
@@ -145,7 +147,8 @@ class UserTask {
         repeat = result['repeat'],
         snooze = result['snooze'],
         reminded = result['reminded'],
-        snoozeMinutes = result['snooze_minutes'];
+        snooze_minutes = result['snooze_minutes'],
+        snooze_triggered = result['snooze_triggered'];
 
   Map<String, Object?> toMap() {
     return {
@@ -156,7 +159,8 @@ class UserTask {
       'repeat': repeat,
       'snooze': snooze,
       'reminded': reminded,
-      'snooze_minutes': snoozeMinutes
+      'snooze_minutes': snooze_minutes,
+      'snooze_triggered': snooze_triggered
     };
   }
 }

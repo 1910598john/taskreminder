@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:taskreminder/tasks.dart';
 import 'set_alarm.dart';
@@ -141,13 +142,14 @@ class _HomeScreen extends State<HomeScreen> {
                 ));
               } else {
                 timeList.add(Task(
-                    "${value[i].id}",
-                    value[i].time,
-                    DateFormat('hh:mm a').parse(value[i].time.toString()),
-                    value[i].task,
-                    userHonorific,
-                    'disabled',
-                    value[i].snooze));
+                  "${value[i].id}",
+                  value[i].time,
+                  DateFormat('hh:mm a').parse(value[i].time.toString()),
+                  value[i].task,
+                  userHonorific,
+                  'disabled',
+                  value[i].snooze,
+                ));
               }
             }
           }
@@ -168,6 +170,8 @@ class _HomeScreen extends State<HomeScreen> {
                       body: 'It is time to do your task.',
                       wakeUpScreen: true,
                       criticalAlert: true,
+                      displayOnForeground: true,
+                      displayOnBackground: true,
                       fullScreenIntent: true),
                   actionButtons: [
                     NotificationActionButton(
@@ -215,6 +219,7 @@ class _HomeScreen extends State<HomeScreen> {
                         '1', 'channelName', 'channel_description',
                         importance: Importance.max,
                         priority: Priority.high,
+                        fullScreenIntent: true,
                         ticker: 'ticker');
                 var iOSPlatformChannelSpecifics =
                     const IOSNotificationDetails();
@@ -232,6 +237,7 @@ class _HomeScreen extends State<HomeScreen> {
                 await handler.isReminded(int.parse(timeList[i].id));
               },
             );
+
             if (timeList[i].status == 'active') {
               tasks.add(ScheduledTasksList(timeList[i].id, task, 'active'));
             } else {
