@@ -3,13 +3,17 @@ import 'package:day_picker/day_picker.dart';
 import 'package:taskreminder/db_helper.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:math';
+import 'package:intl/intl.dart';
 
 FlutterTts flutterTts = FlutterTts();
 
 class SetAlarm extends StatefulWidget {
   final Function startService;
+  final Function setVolume;
 
-  const SetAlarm({Key? key, required this.startService}) : super(key: key);
+  const SetAlarm(
+      {Key? key, required this.startService, required this.setVolume})
+      : super(key: key);
 
   @override
   _SetAlarm createState() => _SetAlarm();
@@ -21,6 +25,8 @@ class _SetAlarm extends State<SetAlarm> {
   late DataBase handler;
 
   Future<int> insertTask(task, time, weekday, snooze) async {
+    var convertedTime = DateFormat("hh:mm a").parse(time).toString();
+    var modifiedTime = convertedTime.substring(11);
     String repeat = "Remind, ";
     String status = 'active';
     if (weekdays_list.isNotEmpty) {
@@ -31,15 +37,14 @@ class _SetAlarm extends State<SetAlarm> {
       repeat = "Only once";
     }
     UserTask data = UserTask(
-      task: task,
-      time: time,
-      status: status,
-      repeat: repeat,
-      snooze: snooze,
-      reminded: 0,
-      snooze_minutes: 0,
-      snooze_triggered: 0
-    );
+        task: task,
+        time: time,
+        status: status,
+        repeat: repeat,
+        snooze: snooze,
+        reminded: 0,
+        modifiedTime: modifiedTime,
+        snoozeTriggered: 0);
     List<UserTask> list = [data];
     return await handler.insertTask(list);
   }
@@ -53,6 +58,11 @@ class _SetAlarm extends State<SetAlarm> {
     super.initState();
     handler = DataBase();
     handler.initializedDB();
+
+    //initialize tts
+    flutterTts.setLanguage("en-US");
+    flutterTts.setPitch(.3);
+    flutterTts.setSpeechRate(0.5);
   }
 
   //textfield tts assistant
@@ -64,9 +74,6 @@ class _SetAlarm extends State<SetAlarm> {
       "Please fill out the textfield.",
       "Please enter your task in the textfield."
     ];
-    await flutterTts.setLanguage("en-US");
-    await flutterTts.setPitch(.3);
-    await flutterTts.setSpeechRate(0.5);
 
     await flutterTts
         .speak(errorMessages[Random().nextInt(errorMessages.length)]);
@@ -554,6 +561,7 @@ class _SetAlarm extends State<SetAlarm> {
                           );
                         });
                   } else {
+                    widget.setVolume();
                     speak();
                   }
                 },

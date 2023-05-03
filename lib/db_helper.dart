@@ -9,7 +9,7 @@ class DataBase {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze INTEGER, reminded INTEGER, snooze_minutes INTEGER, snooze_triggered INTEGER)",
+          "CREATE TABLE tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, modifiedTime TEXT, status TEXT NOT NULL, repeat TEXT NOT NULL, snooze INTEGER, reminded INTEGER, snoozeTriggered INTEGER)",
         );
         await db.execute(
           "CREATE TABLE gender(gender TEXT NOT NULL, honorific TEXT NOT NULL)",
@@ -42,12 +42,23 @@ class DataBase {
     );
   }
 
-  Future<int> isReminded(int id) async {
+  Future<int> isReminded(int id, int n) async {
     final db = await initializedDB();
 
     return await db.update(
       'tasks',
-      {'reminded': 1},
+      {'reminded': n},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> updateModifiedTime(int id, String modTime) async {
+    final db = await initializedDB();
+
+    return await db.update(
+      'tasks',
+      {'modifiedTime': modTime},
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -124,8 +135,8 @@ class UserTask {
   late final String repeat;
   late final int snooze;
   late final int reminded;
-  late final int snooze_minutes;
-  late final int snooze_triggered;
+  late final String modifiedTime;
+  late final int snoozeTriggered;
 
   UserTask({
     this.id,
@@ -135,8 +146,8 @@ class UserTask {
     required this.repeat,
     required this.snooze,
     required this.reminded,
-    required this.snooze_minutes,
-    required this.snooze_triggered,
+    required this.modifiedTime,
+    required this.snoozeTriggered,
   });
 
   UserTask.fromMap(Map<String, dynamic> result)
@@ -147,8 +158,8 @@ class UserTask {
         repeat = result['repeat'],
         snooze = result['snooze'],
         reminded = result['reminded'],
-        snooze_minutes = result['snooze_minutes'],
-        snooze_triggered = result['snooze_triggered'];
+        snoozeTriggered = result['snoozeTriggered'],
+        modifiedTime = result['modifiedTime'];
 
   Map<String, Object?> toMap() {
     return {
@@ -159,8 +170,8 @@ class UserTask {
       'repeat': repeat,
       'snooze': snooze,
       'reminded': reminded,
-      'snooze_minutes': snooze_minutes,
-      'snooze_triggered': snooze_triggered
+      'snoozeTriggered': snoozeTriggered,
+      'modifiedTime': modifiedTime
     };
   }
 }

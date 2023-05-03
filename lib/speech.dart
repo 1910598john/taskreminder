@@ -3,20 +3,25 @@ import 'package:flutter/services.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:flutter/material.dart';
 import 'homescreen.dart';
+import 'package:taskreminder/db_helper.dart';
 
 class Speech extends StatefulWidget {
+  final int id;
   final String task;
   final String time;
   final String honorific;
   final Function startservice;
   final int snooze;
+  final DateTime modifiedTime;
   const Speech(
       {Key? key,
+      required this.id,
       required this.task,
       required this.time,
       required this.honorific,
       required this.startservice,
-      required this.snooze})
+      required this.snooze,
+      required this.modifiedTime})
       : super(key: key);
 
   @override
@@ -24,10 +29,14 @@ class Speech extends StatefulWidget {
 }
 
 class _Speech extends State<Speech> {
+  late DataBase handler;
+
   @override
   void initState() {
     super.initState();
     Wakelock.enable();
+    handler = DataBase();
+    handler.initializedDB();
   }
 
   @override
@@ -150,11 +159,25 @@ class _Speech extends State<Speech> {
                                               Color.fromRGBO(255, 255, 255, 1),
                                           fixedSize: Size(120, 40)),
                                       onPressed: () async {
-                                        SystemNavigator.pop();
+                                        int min = widget.snooze;
+                                        String modifiedTime = widget
+                                            .modifiedTime
+                                            .add(Duration(minutes: min))
+                                            .toString();
+                                        handler.updateModifiedTime(
+                                            widget.id, modifiedTime);
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const HomeScreen()));
                                         setState(() {
                                           running = false;
                                         });
                                         await flutterTts.stop();
+                                        await handler.updateTaskStatus(
+                                            widget.id, 'active');
+                                        await widget.startservice();
                                       },
                                       child: const Text(
                                         'Snooze',

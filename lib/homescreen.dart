@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:taskreminder/tasks.dart';
 import 'set_alarm.dart';
@@ -31,9 +30,12 @@ class Task {
   String honorific;
   String status;
   int snooze;
+  String repeat;
+  DateTime modifiedTime;
+  bool isReminded;
 
   Task(this.id, this.time, this.date, this.task, this.honorific, this.status,
-      this.snooze);
+      this.snooze, this.repeat, this.isReminded, this.modifiedTime);
 }
 
 class ScheduledTasksList {
@@ -51,6 +53,7 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    //initialize awesome_notifications
     AwesomeNotifications().initialize(
       'resource://mipmap/launcher_icon',
       [
@@ -67,6 +70,11 @@ class _HomeScreen extends State<HomeScreen> {
         AwesomeNotifications().requestPermissionToSendNotifications();
       }
     });
+    //initialize tts
+    flutterTts.setLanguage("en-US");
+    flutterTts.setPitch(.3);
+    flutterTts.setSpeechRate(0.5);
+
     startService();
   }
 
@@ -75,9 +83,7 @@ class _HomeScreen extends State<HomeScreen> {
       running = true;
     });
     setVolume();
-    await flutterTts.setLanguage("en-US");
-    await flutterTts.setPitch(.3);
-    await flutterTts.setSpeechRate(0.5);
+
     while (running!) {
       await flutterTts.speak("$honorific, It is time for you to $task");
       await flutterTts.awaitSpeakCompletion(true);
@@ -97,6 +103,7 @@ class _HomeScreen extends State<HomeScreen> {
   void startService() async {
     late DataBase handler;
     late String userHonorific;
+    var now = DateTime.now();
     handler = DataBase();
     handler.initializedDB();
     //fetch honorific
@@ -112,83 +119,79 @@ class _HomeScreen extends State<HomeScreen> {
           tasks[j].task.cancel();
         }
         tasks.clear();
-        List<Task> timeList = [];
+        List<Task> taskList = [];
         for (int i = 0; i < value.length; i++) {
-          String weekday;
-          var currentWeekday = DateFormat('EEEE');
-          weekday = currentWeekday.format(DateTime.now()).toString();
-          weekday = weekday.substring(0, 3);
-
-          if (value[i].repeat.contains(weekday) ||
-              value[i].repeat.contains('Only once')) {
-            //check if time has passed
-            DateFormat formatter = DateFormat('hh:mm a');
-            DateTime now = DateTime.now();
-            var elapsedTime = formatter
-                .parse(DateFormat('hh:mm a').format(now).toString())
-                .difference(
-                    DateFormat('hh:mm a').parse(value[i].time.toString()));
-            //if not..
-            if (!(elapsedTime.compareTo(const Duration(seconds: 1)) >= 0)) {
-              if (value[i].status == 'active') {
-                timeList.add(Task(
+          //check if time has passed
+          DateFormat formatter = DateFormat('hh:mm a');
+          DateTime now = DateTime.now();
+          var elapsedTime = formatter
+              .parse(DateFormat('hh:mm a').format(now).toString())
+              .difference(
+                  DateFormat('hh:mm a').parse(value[i].time.toString()));
+          //if not..
+          var modified = DateFormat("hh:mm:ss").parse(value[i].modifiedTime);
+          if (value[i].status == 'active') {
+            if (value[i].reminded == 0) {
+              taskList.add(Task(
                   "${value[i].id}",
                   value[i].time,
-                  DateFormat('hh:mm a').parse(value[i].time.toString()),
+                  DateFormat('hh:mm:ss').parse(value[i].modifiedTime),
                   value[i].task,
                   userHonorific,
                   'active',
                   value[i].snooze,
-                ));
-              } else {
-                timeList.add(Task(
+                  value[i].repeat,
+                  false,
+                  modified));
+            } else {
+              taskList.add(Task(
                   "${value[i].id}",
                   value[i].time,
-                  DateFormat('hh:mm a').parse(value[i].time.toString()),
+                  DateFormat('hh:mm:ss').parse(value[i].modifiedTime),
+                  value[i].task,
+                  userHonorific,
+                  'active',
+                  value[i].snooze,
+                  value[i].repeat,
+                  true,
+                  modified));
+            }
+          } else {
+            if (value[i].reminded == 0) {
+              taskList.add(Task(
+                  "${value[i].id}",
+                  value[i].time,
+                  DateFormat('hh:mm:ss').parse(value[i].modifiedTime),
                   value[i].task,
                   userHonorific,
                   'disabled',
                   value[i].snooze,
-                ));
-              }
+                  value[i].repeat,
+                  false,
+                  modified));
+            } else {
+              taskList.add(Task(
+                  "${value[i].id}",
+                  value[i].time,
+                  DateFormat('hh:mm:ss').parse(value[i].modifiedTime),
+                  value[i].task,
+                  userHonorific,
+                  'disabled',
+                  value[i].snooze,
+                  value[i].repeat,
+                  true,
+                  modified));
             }
           }
         }
-        if (timeList.isNotEmpty) {
+        if (taskList.isNotEmpty) {
           var cron = Cron();
-          // timeList.sort((a, b) => a.date.compareTo(b.date));
-          for (int i = 0; i < timeList.length; i++) {
+          // taskList.sort((a, b) => a.date.compareTo(b.date));
+          for (int i = 0; i < taskList.length; i++) {
             var task = cron.schedule(
               Schedule.parse(
-                  '${timeList[i].date.minute} ${timeList[i].date.hour} * * *'),
+                  '${taskList[i].date.minute} ${taskList[i].date.hour} * * *'),
               () async {
-                AwesomeNotifications().createNotification(
-                  content: NotificationContent(
-                      id: i,
-                      channelKey: 'key1',
-                      title: 'Hello, ${timeList[i].honorific}!',
-                      body: 'It is time to do your task.',
-                      wakeUpScreen: true,
-                      criticalAlert: true,
-                      displayOnForeground: true,
-                      displayOnBackground: true,
-                      fullScreenIntent: true),
-                  actionButtons: [
-                    NotificationActionButton(
-                      color: Colors.blue,
-                      key: 'snooze',
-                      label: 'Snooze',
-                      buttonType: ActionButtonType.Default,
-                    ),
-                    NotificationActionButton(
-                      color: Colors.blue,
-                      key: 'dismiss',
-                      label: 'Dismiss',
-                      buttonType: ActionButtonType.Default,
-                    ),
-                  ],
-                );
-
                 var initializationSettingsAndroid =
                     const AndroidInitializationSettings(
                         '@mipmap/launcher_icon');
@@ -199,49 +202,91 @@ class _HomeScreen extends State<HomeScreen> {
                     iOS: initializationSettingsIOS);
                 flutterlocalNotificationPlugin =
                     FlutterLocalNotificationsPlugin();
-                await flutterlocalNotificationPlugin!
-                    .initialize(initializationSettings,
-                        onSelectNotification: (String? payload) async {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Speech(
-                                task: timeList[i].task,
-                                time: timeList[i].time,
-                                honorific: timeList[i].honorific,
-                                startservice: initState,
-                                snooze: timeList[i].snooze,
-                              )));
-                });
 
-                var androidPlatformChannelSpecifics =
-                    const AndroidNotificationDetails(
-                        '1', 'channelName', 'channel_description',
-                        importance: Importance.max,
-                        priority: Priority.high,
-                        fullScreenIntent: true,
-                        ticker: 'ticker');
-                var iOSPlatformChannelSpecifics =
-                    const IOSNotificationDetails();
-                var platformChannelSpecifics = NotificationDetails(
-                    android: androidPlatformChannelSpecifics,
-                    iOS: iOSPlatformChannelSpecifics);
+                String weekday;
+                var currentWeekday = DateFormat('EEEE');
+                weekday = currentWeekday.format(DateTime.now()).toString();
+                weekday = weekday.substring(0, 3);
+                if (taskList[i].repeat.contains(weekday) ||
+                    (taskList[i].repeat.contains('Only once') &&
+                        taskList[i].isReminded == false)) {
+                  await flutterlocalNotificationPlugin!
+                      .initialize(initializationSettings,
+                          onSelectNotification: (String? payload) async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Speech(
+                                  id: int.parse(taskList[i].id),
+                                  task: taskList[i].task,
+                                  time: taskList[i].time,
+                                  honorific: taskList[i].honorific,
+                                  startservice: initState,
+                                  snooze: taskList[i].snooze,
+                                  modifiedTime: taskList[i].date,
+                                )));
+                  });
+                  AwesomeNotifications().createNotification(
+                    content: NotificationContent(
+                        id: i,
+                        channelKey: 'key1',
+                        title: 'Hello, ${taskList[i].honorific}!',
+                        body: 'It is time to do your task.',
+                        wakeUpScreen: true,
+                        criticalAlert: true,
+                        displayOnForeground: true,
+                        displayOnBackground: true,
+                        fullScreenIntent: true),
+                    actionButtons: [
+                      NotificationActionButton(
+                        color: Colors.blue,
+                        key: 'snooze',
+                        label: 'Snooze',
+                        buttonType: ActionButtonType.Default,
+                      ),
+                      NotificationActionButton(
+                        color: Colors.blue,
+                        key: 'dismiss',
+                        label: 'Dismiss',
+                        buttonType: ActionButtonType.Default,
+                      ),
+                    ],
+                  );
 
-                await flutterlocalNotificationPlugin!.show(
-                    1,
-                    'Hello, ${timeList[i].honorific}!',
-                    'It is time to do your task.',
-                    platformChannelSpecifics,
-                    payload: 'item x');
-                speak(timeList[i].honorific, timeList[i].task);
-                await handler.isReminded(int.parse(timeList[i].id));
+                  var androidPlatformChannelSpecifics =
+                      const AndroidNotificationDetails(
+                          '1', 'channelName', 'channel_description',
+                          importance: Importance.max,
+                          priority: Priority.high,
+                          fullScreenIntent: true,
+                          ticker: 'ticker');
+                  var iOSPlatformChannelSpecifics =
+                      const IOSNotificationDetails();
+                  var platformChannelSpecifics = NotificationDetails(
+                      android: androidPlatformChannelSpecifics,
+                      iOS: iOSPlatformChannelSpecifics);
+
+                  await flutterlocalNotificationPlugin!.show(
+                      1,
+                      'Hello, ${taskList[i].honorific}!',
+                      'It is time to do your task.',
+                      platformChannelSpecifics,
+                      payload: 'item x');
+                  speak(taskList[i].honorific, taskList[i].task);
+                  await handler.isReminded(int.parse(taskList[i].id), 1);
+
+                  if (taskList[i].repeat.contains('Only once')) {
+                    await handler.updateTaskStatus(
+                        int.parse(taskList[i].id), 'disabled');
+                  }
+                }
               },
             );
 
-            if (timeList[i].status == 'active') {
-              tasks.add(ScheduledTasksList(timeList[i].id, task, 'active'));
+            if (taskList[i].status == 'active') {
+              tasks.add(ScheduledTasksList(taskList[i].id, task, 'active'));
             } else {
-              tasks.add(ScheduledTasksList(timeList[i].id, task, 'disabled'));
+              tasks.add(ScheduledTasksList(taskList[i].id, task, 'disabled'));
             }
           }
 
@@ -311,8 +356,10 @@ class _HomeScreen extends State<HomeScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          SetAlarm(startService: startService)));
+                      builder: (context) => SetAlarm(
+                            startService: startService,
+                            setVolume: setVolume,
+                          )));
             },
             child: Container(
                 padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
