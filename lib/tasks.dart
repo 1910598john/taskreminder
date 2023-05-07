@@ -167,15 +167,6 @@ class _Tasks extends State<Tasks> {
                                                               height: 4,
                                                               width: 0,
                                                             ),
-                                                            snapshot
-                                                                        .data![
-                                                                            index]
-                                                                        .snooze ==
-                                                                    0
-                                                                ? const Text(
-                                                                    'No repeat')
-                                                                : Text(
-                                                                    "Repeat after ${snapshot.data![index].snooze} minutes"),
                                                           ],
                                                         ),
                                                       ),
@@ -340,15 +331,6 @@ class _Tasks extends State<Tasks> {
                                                               height: 4,
                                                               width: 0,
                                                             ),
-                                                            snapshot
-                                                                        .data![
-                                                                            index]
-                                                                        .snooze ==
-                                                                    0
-                                                                ? const Text(
-                                                                    'No repeat')
-                                                                : Text(
-                                                                    "Repeat after ${snapshot.data![index].snooze} minutes"),
                                                           ],
                                                         ),
                                                       ),

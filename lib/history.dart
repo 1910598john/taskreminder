@@ -83,14 +83,12 @@ class _History extends State<History> {
               for (int i = 0; i < snapshot.data!.length; i++) {
                 if (snapshot.data![i].reminded == 1) {
                   lst.add(UserTask(
-                      task: snapshot.data![i].task,
-                      time: snapshot.data![i].time,
-                      status: snapshot.data![i].status,
-                      repeat: snapshot.data![i].repeat,
-                      snooze: snapshot.data![i].snooze,
-                      reminded: snapshot.data![i].reminded,
-                      modifiedTime: snapshot.data![i].modifiedTime,
-                      snoozeTriggered: snapshot.data![i].snoozeTriggered));
+                    task: snapshot.data![i].task,
+                    time: snapshot.data![i].time,
+                    status: snapshot.data![i].status,
+                    repeat: snapshot.data![i].repeat,
+                    reminded: snapshot.data![i].reminded,
+                  ));
                 }
               }
               if (lst.isEmpty) {

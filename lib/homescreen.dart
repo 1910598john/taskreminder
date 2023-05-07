@@ -10,6 +10,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'speech.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:volume_control/volume_control.dart';
+import 'package:vibration/vibration.dart';
 
 FlutterTts flutterTts = FlutterTts();
 FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
@@ -25,17 +26,15 @@ class HomeScreen extends StatefulWidget {
 class Task {
   String id;
   String time;
+  String repeat;
   DateTime date;
   String task;
   String honorific;
   String status;
-  int snooze;
-  String repeat;
-  DateTime modifiedTime;
   bool isReminded;
 
   Task(this.id, this.time, this.date, this.task, this.honorific, this.status,
-      this.snooze, this.repeat, this.isReminded, this.modifiedTime);
+      this.isReminded, this.repeat);
 }
 
 class ScheduledTasksList {
@@ -48,7 +47,6 @@ class ScheduledTasksList {
 class _HomeScreen extends State<HomeScreen> {
   final now = DateTime.now();
   List<ScheduledTasksList> tasks = [];
-  bool speaking = true;
 
   @override
   void initState() {
@@ -78,16 +76,19 @@ class _HomeScreen extends State<HomeScreen> {
     startService();
   }
 
+  void vibrate() {
+    Vibration.vibrate(pattern: [500, 1000, 500], repeat: 1);
+  }
+
   void speak(honorific, task) async {
     setState(() {
       running = true;
     });
     setVolume();
-
+    vibrate();
     while (running!) {
       await flutterTts.speak("$honorific, It is time for you to $task");
       await flutterTts.awaitSpeakCompletion(true);
-      Future.delayed(const Duration(seconds: 8));
     }
   }
 
@@ -124,63 +125,55 @@ class _HomeScreen extends State<HomeScreen> {
           //check if time has passed
           DateFormat formatter = DateFormat('hh:mm a');
           DateTime now = DateTime.now();
-          var elapsedTime = formatter
+          /*var elapsedTime = formatter
               .parse(DateFormat('hh:mm a').format(now).toString())
               .difference(
-                  DateFormat('hh:mm a').parse(value[i].time.toString()));
+                  DateFormat('hh:mm a').parse(value[i].time.toString()));  */
           //if not..
-          var modified = DateFormat("hh:mm:ss").parse(value[i].modifiedTime);
+
           if (value[i].status == 'active') {
             if (value[i].reminded == 0) {
               taskList.add(Task(
                   "${value[i].id}",
                   value[i].time,
-                  DateFormat('hh:mm:ss').parse(value[i].modifiedTime),
+                  DateFormat('hh:mm a').parse(value[i].time),
                   value[i].task,
                   userHonorific,
                   'active',
-                  value[i].snooze,
-                  value[i].repeat,
                   false,
-                  modified));
+                  value[i].repeat));
             } else {
               taskList.add(Task(
                   "${value[i].id}",
                   value[i].time,
-                  DateFormat('hh:mm:ss').parse(value[i].modifiedTime),
+                  DateFormat('hh:mm a').parse(value[i].time),
                   value[i].task,
                   userHonorific,
                   'active',
-                  value[i].snooze,
-                  value[i].repeat,
                   true,
-                  modified));
+                  value[i].repeat));
             }
           } else {
             if (value[i].reminded == 0) {
               taskList.add(Task(
                   "${value[i].id}",
                   value[i].time,
-                  DateFormat('hh:mm:ss').parse(value[i].modifiedTime),
+                  DateFormat('hh:mm a').parse(value[i].time),
                   value[i].task,
                   userHonorific,
                   'disabled',
-                  value[i].snooze,
-                  value[i].repeat,
                   false,
-                  modified));
+                  value[i].repeat));
             } else {
               taskList.add(Task(
                   "${value[i].id}",
                   value[i].time,
-                  DateFormat('hh:mm:ss').parse(value[i].modifiedTime),
+                  DateFormat('hh:mm a').parse(value[i].time),
                   value[i].task,
                   userHonorific,
                   'disabled',
-                  value[i].snooze,
-                  value[i].repeat,
                   true,
-                  modified));
+                  value[i].repeat));
             }
           }
         }
@@ -222,8 +215,6 @@ class _HomeScreen extends State<HomeScreen> {
                                   time: taskList[i].time,
                                   honorific: taskList[i].honorific,
                                   startservice: initState,
-                                  snooze: taskList[i].snooze,
-                                  modifiedTime: taskList[i].date,
                                 )));
                   });
                   AwesomeNotifications().createNotification(
@@ -238,12 +229,6 @@ class _HomeScreen extends State<HomeScreen> {
                         displayOnBackground: true,
                         fullScreenIntent: true),
                     actionButtons: [
-                      NotificationActionButton(
-                        color: Colors.blue,
-                        key: 'snooze',
-                        label: 'Snooze',
-                        buttonType: ActionButtonType.Default,
-                      ),
                       NotificationActionButton(
                         color: Colors.blue,
                         key: 'dismiss',
