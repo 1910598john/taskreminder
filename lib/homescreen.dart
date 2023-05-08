@@ -10,7 +10,6 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'speech.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:volume_control/volume_control.dart';
-import 'package:vibration/vibration.dart';
 
 FlutterTts flutterTts = FlutterTts();
 FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
@@ -47,6 +46,7 @@ class ScheduledTasksList {
 class _HomeScreen extends State<HomeScreen> {
   final now = DateTime.now();
   List<ScheduledTasksList> tasks = [];
+  bool speaking = true;
 
   @override
   void initState() {
@@ -76,16 +76,12 @@ class _HomeScreen extends State<HomeScreen> {
     startService();
   }
 
-  void vibrate() {
-    Vibration.vibrate(pattern: [500, 1000, 500], repeat: 1);
-  }
-
   void speak(honorific, task) async {
     setState(() {
       running = true;
     });
     setVolume();
-    vibrate();
+
     while (running!) {
       await flutterTts.speak("$honorific, It is time for you to $task");
       await flutterTts.awaitSpeakCompletion(true);
@@ -185,17 +181,6 @@ class _HomeScreen extends State<HomeScreen> {
               Schedule.parse(
                   '${taskList[i].date.minute} ${taskList[i].date.hour} * * *'),
               () async {
-                var initializationSettingsAndroid =
-                    const AndroidInitializationSettings(
-                        '@mipmap/launcher_icon');
-                var initializationSettingsIOS =
-                    const IOSInitializationSettings();
-                var initializationSettings = InitializationSettings(
-                    android: initializationSettingsAndroid,
-                    iOS: initializationSettingsIOS);
-                flutterlocalNotificationPlugin =
-                    FlutterLocalNotificationsPlugin();
-
                 String weekday;
                 var currentWeekday = DateFormat('EEEE');
                 weekday = currentWeekday.format(DateTime.now()).toString();
@@ -203,31 +188,25 @@ class _HomeScreen extends State<HomeScreen> {
                 if (taskList[i].repeat.contains(weekday) ||
                     (taskList[i].repeat.contains('Only once') &&
                         taskList[i].isReminded == false)) {
-                  await flutterlocalNotificationPlugin!
-                      .initialize(initializationSettings,
-                          onSelectNotification: (String? payload) async {
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Speech(
-                                  id: int.parse(taskList[i].id),
-                                  task: taskList[i].task,
-                                  time: taskList[i].time,
-                                  honorific: taskList[i].honorific,
-                                  startservice: initState,
-                                )));
-                  });
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Speech(
+                                id: int.parse(taskList[i].id),
+                                task: taskList[i].task,
+                                time: taskList[i].time,
+                                honorific: taskList[i].honorific,
+                                startservice: initState,
+                              )));
+
                   AwesomeNotifications().createNotification(
                     content: NotificationContent(
-                        id: i,
-                        channelKey: 'key1',
-                        title: 'Hello, ${taskList[i].honorific}!',
-                        body: 'It is time to do your task.',
-                        wakeUpScreen: true,
-                        criticalAlert: true,
-                        displayOnForeground: true,
-                        displayOnBackground: true,
-                        fullScreenIntent: true),
+                      id: i,
+                      channelKey: 'key1',
+                      title: 'Hello, ${taskList[i].honorific}!',
+                      body: 'It is time to do your task.',
+                      fullScreenIntent: true,
+                    ),
                     actionButtons: [
                       NotificationActionButton(
                         color: Colors.blue,
@@ -238,25 +217,6 @@ class _HomeScreen extends State<HomeScreen> {
                     ],
                   );
 
-                  var androidPlatformChannelSpecifics =
-                      const AndroidNotificationDetails(
-                          '1', 'channelName', 'channel_description',
-                          importance: Importance.max,
-                          priority: Priority.high,
-                          fullScreenIntent: true,
-                          ticker: 'ticker');
-                  var iOSPlatformChannelSpecifics =
-                      const IOSNotificationDetails();
-                  var platformChannelSpecifics = NotificationDetails(
-                      android: androidPlatformChannelSpecifics,
-                      iOS: iOSPlatformChannelSpecifics);
-
-                  await flutterlocalNotificationPlugin!.show(
-                      1,
-                      'Hello, ${taskList[i].honorific}!',
-                      'It is time to do your task.',
-                      platformChannelSpecifics,
-                      payload: 'item x');
                   speak(taskList[i].honorific, taskList[i].task);
                   await handler.isReminded(int.parse(taskList[i].id), 1);
 

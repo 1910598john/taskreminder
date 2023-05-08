@@ -3,7 +3,6 @@ import 'package:day_picker/day_picker.dart';
 import 'package:taskreminder/db_helper.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:math';
-import 'package:intl/intl.dart';
 
 FlutterTts flutterTts = FlutterTts();
 
@@ -63,7 +62,6 @@ class _SetAlarm extends State<SetAlarm> {
   void speak() async {
     List<String> errorMessages = [
       "You haven't entered your task yet.",
-      "Textfield must be filled out.",
       "You haven't entered anything in the textfield.",
       "Please fill out the textfield.",
       "Please enter your task in the textfield."
