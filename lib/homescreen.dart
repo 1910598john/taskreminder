@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:taskreminder/tasks.dart';
 import 'set_alarm.dart';
 import 'history.dart';
@@ -44,44 +47,15 @@ class ScheduledTasksList {
   ScheduledTasksList(this.id, this.task, this.status);
 }
 
-@pragma(
-    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) {
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: 1,
-        channelKey: 'key1',
-        title: inputData!['title'],
-        body: inputData['content'],
-        fullScreenIntent: true,
-      ),
-      actionButtons: [
-        NotificationActionButton(
-          color: Colors.blue,
-          key: 'dismiss',
-          label: 'Dismiss',
-          buttonType: ActionButtonType.Default,
-        ),
-      ],
-    );
-    return Future.value(true);
-  });
-}
-
 class _HomeScreen extends State<HomeScreen> {
   final now = DateTime.now();
+  late DataBase handler;
   List<ScheduledTasksList> tasks = [];
   bool speaking = true;
 
   @override
   void initState() {
     super.initState();
-    Workmanager().initialize(
-        callbackDispatcher, // The top level function, aka callbackDispatcher
-        isInDebugMode:
-            true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-        );
     //initialize awesome_notifications
     AwesomeNotifications().initialize(
       'resource://mipmap/launcher_icon',
@@ -90,6 +64,7 @@ class _HomeScreen extends State<HomeScreen> {
           channelKey: 'key1',
           channelName: 'Channel Name',
           channelDescription: 'Channel Description',
+          importance: NotificationImportance.High,
         )
       ],
     );
@@ -127,8 +102,13 @@ class _HomeScreen extends State<HomeScreen> {
     }
   }
 
+  void insertIntoHistory(task, time, repeat) async {
+    TasksHistory data = TasksHistory(task: task, time: time, repeat: repeat);
+    List<TasksHistory> lst = [data];
+    await handler.insertHistory(lst);
+  }
+
   void startService() async {
-    late DataBase handler;
     late String userHonorific;
     var now = DateTime.now();
     handler = DataBase();
@@ -148,15 +128,6 @@ class _HomeScreen extends State<HomeScreen> {
         tasks.clear();
         List<Task> taskList = [];
         for (int i = 0; i < value.length; i++) {
-          //check if time has passed
-          DateFormat formatter = DateFormat('hh:mm a');
-          DateTime now = DateTime.now();
-          /*var elapsedTime = formatter
-              .parse(DateFormat('hh:mm a').format(now).toString())
-              .difference(
-                  DateFormat('hh:mm a').parse(value[i].time.toString()));  */
-          //if not..
-
           if (value[i].status == 'active') {
             if (value[i].reminded == 0) {
               taskList.add(Task(
@@ -205,8 +176,6 @@ class _HomeScreen extends State<HomeScreen> {
         }
         if (taskList.isNotEmpty) {
           var cron = Cron();
-
-          // taskList.sort((a, b) => a.date.compareTo(b.date));
           for (int i = 0; i < taskList.length; i++) {
             var task = cron.schedule(
               Schedule.parse(
@@ -219,13 +188,6 @@ class _HomeScreen extends State<HomeScreen> {
                 if (taskList[i].repeat.contains(weekday) ||
                     (taskList[i].repeat.contains('Only once') &&
                         taskList[i].isReminded == false)) {
-                  Workmanager().registerOneOffTask(
-                      "task-identifier", "simpleTask",
-                      initialDelay: Duration(seconds: 2),
-                      inputData: {
-                        'title': 'hello, sir!',
-                        'content': 'pota ka!!!!'
-                      });
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -255,6 +217,12 @@ class _HomeScreen extends State<HomeScreen> {
                     ],
                   );
 
+                  AwesomeNotifications().actionStream.listen((event) {
+                    if (event.buttonKeyPressed == 'dismiss') {
+                      SystemNavigator.pop();
+                    }
+                  });
+
                   speak(taskList[i].honorific, taskList[i].task);
                   await handler.isReminded(int.parse(taskList[i].id), 1);
 
@@ -262,6 +230,9 @@ class _HomeScreen extends State<HomeScreen> {
                     await handler.updateTaskStatus(
                         int.parse(taskList[i].id), 'disabled');
                   }
+
+                  insertIntoHistory(
+                      taskList[i].task, taskList[i].time, taskList[i].repeat);
                 }
               },
             );

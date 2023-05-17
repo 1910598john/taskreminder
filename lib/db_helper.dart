@@ -16,7 +16,7 @@ class DataBase {
           "CREATE TABLE gender(gender TEXT NOT NULL, honorific TEXT NOT NULL)",
         );
         await db.execute(
-          "CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL)",
+          "CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL, repeat TEXT NOT NULL)",
         );
       },
     );
@@ -176,23 +176,22 @@ class TasksHistory {
   late final int? id;
   late final String task;
   late final String time;
+  late final String repeat;
 
   TasksHistory({
     this.id,
     required this.task,
     required this.time,
+    required this.repeat,
   });
 
   TasksHistory.fromMap(Map<String, dynamic> result)
       : id = result["id"],
         task = result["task"],
-        time = result["time"];
+        time = result["time"],
+        repeat = result["repeat"];
 
   Map<String, Object?> toMap() {
-    return {
-      'id': id,
-      'task': task,
-      'time': time,
-    };
+    return {'id': id, 'task': task, 'time': time, 'repeat': repeat};
   }
 }

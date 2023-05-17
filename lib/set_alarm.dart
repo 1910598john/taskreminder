@@ -76,7 +76,7 @@ class _SetAlarm extends State<SetAlarm> {
   List<String> weekdays_list = [];
   TextEditingController task = TextEditingController();
   int initialHour = DateTime.now().hour;
-  int initialMin = DateTime.now().minute + 5;
+  int initialMin = DateTime.now().minute;
 
   initialTime() {
     int checkHour = initialHour;
@@ -107,7 +107,7 @@ class _SetAlarm extends State<SetAlarm> {
 
   void _showTimePicker() {
     int hr = DateTime.now().hour;
-    int min = DateTime.now().minute + 5;
+    int min = DateTime.now().minute;
     if (min > 59) {
       min -= 60;
       hr += 1;

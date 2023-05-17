@@ -155,21 +155,22 @@ class _Tasks extends State<Tasks> {
                                                               overflow:
                                                                   TextOverflow
                                                                       .ellipsis,
-                                                              style: const TextStyle(
-                                                                  color: Color
-                                                                      .fromARGB(
-                                                                          255,
-                                                                          78,
-                                                                          49,
-                                                                          170)),
+                                                              style:
+                                                                  const TextStyle(
+                                                                      fontSize:
+                                                                          15),
                                                             ),
                                                             const SizedBox(
                                                               height: 4,
                                                               width: 0,
                                                             ),
-                                                            Text(snapshot
-                                                                .data![index]
-                                                                .repeat),
+                                                            Text(
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .repeat,
+                                                              style: TextStyle(
+                                                                  fontSize: 13),
+                                                            ),
                                                             const SizedBox(
                                                               height: 4,
                                                               width: 0,
@@ -331,20 +332,23 @@ class _Tasks extends State<Tasks> {
                                                                 overflow:
                                                                     TextOverflow
                                                                         .ellipsis,
-                                                                style: const TextStyle(
-                                                                    color: Color
-                                                                        .fromARGB(
-                                                                            255,
-                                                                            78,
-                                                                            49,
-                                                                            170))),
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            15)),
                                                             const SizedBox(
                                                               height: 4,
                                                               width: 0,
                                                             ),
-                                                            Text(snapshot
-                                                                .data![index]
-                                                                .repeat),
+                                                            Text(
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .repeat,
+                                                              style:
+                                                                  const TextStyle(
+                                                                      fontSize:
+                                                                          13),
+                                                            ),
                                                             const SizedBox(
                                                               height: 4,
                                                               width: 0,

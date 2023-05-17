@@ -76,22 +76,10 @@ class _History extends State<History> {
         ),
         const Divider(),
         FutureBuilder(
-            future: handler.retrieveTasks(),
-            builder:
-                (BuildContext context, AsyncSnapshot<List<UserTask>> snapshot) {
-              List<UserTask> lst = [];
-              for (int i = 0; i < snapshot.data!.length; i++) {
-                if (snapshot.data![i].reminded == 1) {
-                  lst.add(UserTask(
-                    task: snapshot.data![i].task,
-                    time: snapshot.data![i].time,
-                    status: snapshot.data![i].status,
-                    repeat: snapshot.data![i].repeat,
-                    reminded: snapshot.data![i].reminded,
-                  ));
-                }
-              }
-              if (lst.isEmpty) {
+            future: handler.retrieveDoneTasks(),
+            builder: (BuildContext context,
+                AsyncSnapshot<List<TasksHistory>> snapshot) {
+              if (snapshot.data!.isEmpty) {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -115,9 +103,9 @@ class _History extends State<History> {
                         child: ListView.builder(
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
-                            itemCount: lst.length,
+                            itemCount: snapshot.data!.length,
                             itemBuilder: ((context, index) {
-                              if (index == (lst.length - 1)) {
+                              if (index == (snapshot.data!.length - 1)) {
                                 return Container(
                                   padding:
                                       const EdgeInsets.fromLTRB(30, 3, 30, 3),
@@ -134,20 +122,20 @@ class _History extends State<History> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              lst[index].time,
+                                              snapshot.data![index].time,
                                               style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 20),
                                             ),
                                             Text(
-                                              lst[index].task,
+                                              snapshot.data![index].task,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
                                                   fontSize: 13),
                                             ),
                                             Text(
-                                              lst[index].repeat,
+                                              snapshot.data![index].repeat,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
@@ -161,7 +149,7 @@ class _History extends State<History> {
                                               onTap: () {
                                                 setState(() {});
 
-                                                handler.deleteTask(
+                                                handler.deleteHistory(
                                                     snapshot.data![index].id);
                                               },
                                               child: const Icon(
@@ -194,20 +182,20 @@ class _History extends State<History> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              lst[index].time,
+                                              snapshot.data![index].time,
                                               style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 20),
                                             ),
                                             Text(
-                                              lst[index].task,
+                                              snapshot.data![index].task,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
                                                   fontSize: 13),
                                             ),
                                             Text(
-                                              lst[index].repeat,
+                                              snapshot.data![index].repeat,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
@@ -221,7 +209,7 @@ class _History extends State<History> {
                                               onTap: () {
                                                 setState(() {});
 
-                                                handler.deleteTask(
+                                                handler.deleteHistory(
                                                     snapshot.data![index].id);
                                               },
                                               child: const Icon(
