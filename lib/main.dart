@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
-import 'gender.dart';
+import 'check_gender.dart';
+
+/*
+    
+
+    c
+    
+*/
 
 void main() {
   runApp(MyApp());

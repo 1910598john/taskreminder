@@ -156,23 +156,21 @@ class _History extends State<History> {
                                           ],
                                         ),
                                         Row(
-                                          children: const [
-                                            Icon(
-                                              Icons.delete_sharp,
-                                              color: Color.fromARGB(
-                                                  255, 78, 49, 170),
-                                              size: 30,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                              height: 0,
-                                            ),
-                                            Icon(
-                                              Icons.repeat,
-                                              color: Color.fromARGB(
-                                                  255, 78, 49, 170),
-                                              size: 30,
-                                            ),
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                setState(() {});
+
+                                                handler.deleteTask(
+                                                    snapshot.data![index].id);
+                                              },
+                                              child: const Icon(
+                                                Icons.delete_sharp,
+                                                color: Color.fromARGB(
+                                                    255, 78, 49, 170),
+                                                size: 30,
+                                              ),
+                                            )
                                           ],
                                         )
                                       ],
@@ -218,23 +216,21 @@ class _History extends State<History> {
                                           ],
                                         ),
                                         Row(
-                                          children: const [
-                                            Icon(
-                                              Icons.delete_sharp,
-                                              color: Color.fromARGB(
-                                                  255, 78, 49, 170),
-                                              size: 30,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                              height: 0,
-                                            ),
-                                            Icon(
-                                              Icons.repeat,
-                                              color: Color.fromARGB(
-                                                  255, 78, 49, 170),
-                                              size: 30,
-                                            ),
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                setState(() {});
+
+                                                handler.deleteTask(
+                                                    snapshot.data![index].id);
+                                              },
+                                              child: const Icon(
+                                                Icons.delete_sharp,
+                                                color: Color.fromARGB(
+                                                    255, 78, 49, 170),
+                                                size: 30,
+                                              ),
+                                            )
                                           ],
                                         )
                                       ],

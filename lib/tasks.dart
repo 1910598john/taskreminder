@@ -141,7 +141,7 @@ class _Tasks extends State<Tasks> {
                                                       title: Text(snapshot
                                                           .data![index].time),
                                                       content: Container(
-                                                        height: 90,
+                                                        height: 70,
                                                         child: Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
@@ -155,6 +155,13 @@ class _Tasks extends State<Tasks> {
                                                               overflow:
                                                                   TextOverflow
                                                                       .ellipsis,
+                                                              style: const TextStyle(
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          78,
+                                                                          49,
+                                                                          170)),
                                                             ),
                                                             const SizedBox(
                                                               height: 4,
@@ -174,7 +181,9 @@ class _Tasks extends State<Tasks> {
                                                         TextButton(
                                                             onPressed:
                                                                 () async {
-                                                              setState(() {});
+                                                              status.removeAt(
+                                                                  index);
+
                                                               Navigator.of(
                                                                       context)
                                                                   .pop();
@@ -185,8 +194,10 @@ class _Tasks extends State<Tasks> {
                                                                           .data![
                                                                               index]
                                                                           .id);
+
                                                               await widget
                                                                   .start();
+                                                              setState(() {});
                                                             },
                                                             child: const Text(
                                                               'DELETE',
@@ -305,21 +316,28 @@ class _Tasks extends State<Tasks> {
                                                       title: Text(snapshot
                                                           .data![index].time),
                                                       content: Container(
-                                                        height: 90,
+                                                        height: 70,
                                                         child: Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
                                                             Text(
-                                                              snapshot
-                                                                  .data![index]
-                                                                  .task,
-                                                              maxLines: 2,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
+                                                                snapshot
+                                                                    .data![
+                                                                        index]
+                                                                    .task,
+                                                                maxLines: 2,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: const TextStyle(
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            78,
+                                                                            49,
+                                                                            170))),
                                                             const SizedBox(
                                                               height: 4,
                                                               width: 0,
@@ -338,7 +356,9 @@ class _Tasks extends State<Tasks> {
                                                         TextButton(
                                                             onPressed:
                                                                 () async {
-                                                              setState(() {});
+                                                              status.removeAt(
+                                                                  index);
+
                                                               Navigator.of(
                                                                       context)
                                                                   .pop();
@@ -350,6 +370,7 @@ class _Tasks extends State<Tasks> {
                                                                       .id);
                                                               await widget
                                                                   .start();
+                                                              setState(() {});
                                                             },
                                                             child: const Text(
                                                               'DELETE',

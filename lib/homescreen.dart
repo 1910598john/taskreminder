@@ -10,9 +10,10 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'speech.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:volume_control/volume_control.dart';
+import 'package:workmanager/workmanager.dart';
 
 FlutterTts flutterTts = FlutterTts();
-FlutterLocalNotificationsPlugin? flutterlocalNotificationPlugin;
+
 bool? running;
 
 class HomeScreen extends StatefulWidget {
@@ -43,6 +44,31 @@ class ScheduledTasksList {
   ScheduledTasksList(this.id, this.task, this.status);
 }
 
+@pragma(
+    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 1,
+        channelKey: 'key1',
+        title: inputData!['title'],
+        body: inputData['content'],
+        fullScreenIntent: true,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          color: Colors.blue,
+          key: 'dismiss',
+          label: 'Dismiss',
+          buttonType: ActionButtonType.Default,
+        ),
+      ],
+    );
+    return Future.value(true);
+  });
+}
+
 class _HomeScreen extends State<HomeScreen> {
   final now = DateTime.now();
   List<ScheduledTasksList> tasks = [];
@@ -51,6 +77,11 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    Workmanager().initialize(
+        callbackDispatcher, // The top level function, aka callbackDispatcher
+        isInDebugMode:
+            true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+        );
     //initialize awesome_notifications
     AwesomeNotifications().initialize(
       'resource://mipmap/launcher_icon',
@@ -59,7 +90,6 @@ class _HomeScreen extends State<HomeScreen> {
           channelKey: 'key1',
           channelName: 'Channel Name',
           channelDescription: 'Channel Description',
-          importance: NotificationImportance.High,
         )
       ],
     );
@@ -175,6 +205,7 @@ class _HomeScreen extends State<HomeScreen> {
         }
         if (taskList.isNotEmpty) {
           var cron = Cron();
+
           // taskList.sort((a, b) => a.date.compareTo(b.date));
           for (int i = 0; i < taskList.length; i++) {
             var task = cron.schedule(
@@ -188,6 +219,13 @@ class _HomeScreen extends State<HomeScreen> {
                 if (taskList[i].repeat.contains(weekday) ||
                     (taskList[i].repeat.contains('Only once') &&
                         taskList[i].isReminded == false)) {
+                  Workmanager().registerOneOffTask(
+                      "task-identifier", "simpleTask",
+                      initialDelay: Duration(seconds: 2),
+                      inputData: {
+                        'title': 'hello, sir!',
+                        'content': 'pota ka!!!!'
+                      });
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -195,15 +233,15 @@ class _HomeScreen extends State<HomeScreen> {
                                 id: int.parse(taskList[i].id),
                                 task: taskList[i].task,
                                 time: taskList[i].time,
-                                honorific: taskList[i].honorific,
+                                honorific: userHonorific,
                                 startservice: initState,
                               )));
 
                   AwesomeNotifications().createNotification(
                     content: NotificationContent(
-                      id: i,
+                      id: 1,
                       channelKey: 'key1',
-                      title: 'Hello, ${taskList[i].honorific}!',
+                      title: 'Hello, $userHonorific!',
                       body: 'It is time to do your task.',
                       fullScreenIntent: true,
                     ),

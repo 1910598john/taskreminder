@@ -1,5 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:taskreminder/homescreen.dart';
 
 class DataBase {
   Future<Database> initializedDB() async {
@@ -14,11 +15,14 @@ class DataBase {
         await db.execute(
           "CREATE TABLE gender(gender TEXT NOT NULL, honorific TEXT NOT NULL)",
         );
+        await db.execute(
+          "CREATE TABLE history(id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT NOT NULL, time TEXT NOT NULL)",
+        );
       },
     );
   }
 
-  // insert data
+  // tasks db operations
   Future<int> insertTask(List<UserTask> task) async {
     int result = 0;
     final Database db = await initializedDB();
@@ -53,7 +57,6 @@ class DataBase {
     );
   }
 
-  // retrieve data
   Future<List<UserTask>> retrieveTasks() async {
     final Database db = await initializedDB();
     final List<Map<String, Object?>> queryResult =
@@ -61,7 +64,16 @@ class DataBase {
     return queryResult.map((e) => UserTask.fromMap(e)).toList();
   }
 
-  // insert data
+  Future<void> deleteTask(int? id) async {
+    final db = await initializedDB();
+    await db.delete(
+      'tasks',
+      where: "id = ?",
+      whereArgs: [id],
+    );
+  }
+
+  //gender db operations
   Future<int> insertUserGender(List<Gender> task) async {
     int result = 0;
     final Database db = await initializedDB();
@@ -72,18 +84,36 @@ class DataBase {
     return result;
   }
 
-  // retrieve data
   Future<List<Gender>> getUserGender() async {
     final Database db = await initializedDB();
     final List<Map<String, Object?>> queryResult = await db.query('gender');
     return queryResult.map((e) => Gender.fromMap(e)).toList();
   }
 
-  // delete user
-  Future<void> deleteTask(int? id) async {
+  //history db operations
+  Future<int> insertHistory(List<TasksHistory> task) async {
+    int result = 0;
+    final Database db = await initializedDB();
+
+    for (var item in task) {
+      result = await db.insert('history', item.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+
+    return result;
+  }
+
+  Future<List<TasksHistory>> retrieveDoneTasks() async {
+    final Database db = await initializedDB();
+    final List<Map<String, Object?>> queryResult =
+        await db.query('history', columns: null, orderBy: 'id DESC');
+    return queryResult.map((e) => TasksHistory.fromMap(e)).toList();
+  }
+
+  Future<void> deleteHistory(int? id) async {
     final db = await initializedDB();
     await db.delete(
-      'tasks',
+      'history',
       where: "id = ?",
       whereArgs: [id],
     );
@@ -138,6 +168,31 @@ class UserTask {
       'status': status,
       'repeat': repeat,
       'reminded': reminded
+    };
+  }
+}
+
+class TasksHistory {
+  late final int? id;
+  late final String task;
+  late final String time;
+
+  TasksHistory({
+    this.id,
+    required this.task,
+    required this.time,
+  });
+
+  TasksHistory.fromMap(Map<String, dynamic> result)
+      : id = result["id"],
+        task = result["task"],
+        time = result["time"];
+
+  Map<String, Object?> toMap() {
+    return {
+      'id': id,
+      'task': task,
+      'time': time,
     };
   }
 }
