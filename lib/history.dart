@@ -105,6 +105,10 @@ class _History extends State<History> {
                             scrollDirection: Axis.vertical,
                             itemCount: snapshot.data!.length,
                             itemBuilder: ((context, index) {
+                              String toDo = snapshot.data![index].task;
+                              if (toDo.length > 20) {
+                                toDo = "${toDo.substring(0, 20)}..";
+                              }
                               if (index == (snapshot.data!.length - 1)) {
                                 return Container(
                                   padding:
@@ -128,7 +132,7 @@ class _History extends State<History> {
                                                   fontSize: 20),
                                             ),
                                             Text(
-                                              snapshot.data![index].task,
+                                              toDo,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),
@@ -188,7 +192,7 @@ class _History extends State<History> {
                                                   fontSize: 20),
                                             ),
                                             Text(
-                                              snapshot.data![index].task,
+                                              toDo,
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 78, 49, 170),

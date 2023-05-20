@@ -46,7 +46,20 @@ class _CheckGender extends State<CheckGender> {
                 Text(
                   'SELECT GENDER',
                   style: TextStyle(
-                    fontFamily: 'Coffee',
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(1, 1),
+                        blurRadius: 2,
+                        color: Color.fromARGB(255, 78, 49, 170),
+                      ),
+                      Shadow(
+                        offset: Offset(1, 1),
+                        blurRadius: 2,
+                        color: Color.fromARGB(255, 78, 49, 170),
+                      ),
+                    ],
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'WanSans',
                     fontSize: 30,
                     color: Colors.white,
                   ),

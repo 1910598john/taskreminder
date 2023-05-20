@@ -1,12 +1,15 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:flutter/material.dart';
 import 'homescreen.dart';
 import 'package:taskreminder/db_helper.dart';
+import 'package:vibration/vibration.dart';
 
 class Speech extends StatefulWidget {
   final int id;
+  final int notificationID;
   final String task;
   final String time;
   final String honorific;
@@ -14,6 +17,7 @@ class Speech extends StatefulWidget {
   const Speech({
     Key? key,
     required this.id,
+    required this.notificationID,
     required this.task,
     required this.time,
     required this.honorific,
@@ -107,7 +111,9 @@ class _Speech extends State<Speech> {
                                   setState(() {
                                     running = false;
                                   });
+                                  Vibration.cancel();
                                   await flutterTts.stop();
+                                  widget.startservice();
                                 },
                                 child: const Text(
                                   'Dismiss',

@@ -1,5 +1,4 @@
-import 'dart:ffi';
-
+import 'package:vibration/vibration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:taskreminder/tasks.dart';
@@ -13,9 +12,13 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'speech.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:volume_control/volume_control.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+
+// import 'package:workmanager/workmanager.dart';
 
 FlutterTts flutterTts = FlutterTts();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 bool? running;
 
@@ -41,10 +44,9 @@ class Task {
 }
 
 class ScheduledTasksList {
-  ScheduledTask task;
   String status;
-  String id;
-  ScheduledTasksList(this.id, this.task, this.status);
+  int id;
+  ScheduledTasksList(this.id, this.status);
 }
 
 class _HomeScreen extends State<HomeScreen> {
@@ -56,16 +58,15 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    //initialize awesome_notifications
+
     AwesomeNotifications().initialize(
       'resource://mipmap/launcher_icon',
       [
         NotificationChannel(
-          channelKey: 'key1',
-          channelName: 'Channel Name',
-          channelDescription: 'Channel Description',
-          importance: NotificationImportance.High,
-        )
+            channelKey: 'key1',
+            channelName: 'Channel Name',
+            channelDescription: 'Channel Description',
+            importance: NotificationImportance.High)
       ],
     );
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
@@ -73,6 +74,7 @@ class _HomeScreen extends State<HomeScreen> {
         AwesomeNotifications().requestPermissionToSendNotifications();
       }
     });
+
     //initialize tts
     flutterTts.setLanguage("en-US");
     flutterTts.setPitch(.3);
@@ -121,10 +123,7 @@ class _HomeScreen extends State<HomeScreen> {
     });
     await handler.retrieveTasks().then((value) {
       if (value.isNotEmpty) {
-        //
-        for (int j = 0; j < tasks.length; j++) {
-          tasks[j].task.cancel();
-        }
+        AwesomeNotifications().cancelAll();
         tasks.clear();
         List<Task> taskList = [];
         for (int i = 0; i < value.length; i++) {
@@ -177,10 +176,36 @@ class _HomeScreen extends State<HomeScreen> {
         if (taskList.isNotEmpty) {
           var cron = Cron();
           for (int i = 0; i < taskList.length; i++) {
-            var task = cron.schedule(
-              Schedule.parse(
-                  '${taskList[i].date.minute} ${taskList[i].date.hour} * * *'),
-              () async {
+            AwesomeNotifications().createNotification(
+                content: NotificationContent(
+                  id: i,
+                  channelKey: 'key1',
+                  title: 'Hello, $userHonorific!',
+                  body: 'It is time to do your task.',
+                  fullScreenIntent: true,
+                ),
+                actionButtons: [
+                  NotificationActionButton(
+                    color: Colors.blue,
+                    key: 'dismiss',
+                    label: 'Dismiss',
+                    buttonType: ActionButtonType.Default,
+                  ),
+                ],
+                schedule: NotificationCalendar(
+                    hour: taskList[i].date.hour,
+                    minute: taskList[i].date.minute,
+                    second: 0));
+
+            AwesomeNotifications().actionStream.listen((event) {
+              if (event.buttonKeyPressed == 'dismiss') {
+                AwesomeNotifications().dismiss(i);
+                SystemNavigator.pop();
+                startService();
+              }
+            });
+            AwesomeNotifications().actionStream.listen((event) {
+              if (event.createdSource == NotificationSource.Local) {
                 String weekday;
                 var currentWeekday = DateFormat('EEEE');
                 weekday = currentWeekday.format(DateTime.now()).toString();
@@ -188,65 +213,46 @@ class _HomeScreen extends State<HomeScreen> {
                 if (taskList[i].repeat.contains(weekday) ||
                     (taskList[i].repeat.contains('Only once') &&
                         taskList[i].isReminded == false)) {
+                  speak(userHonorific, taskList[i].task);
+
                   Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => Speech(
                                 id: int.parse(taskList[i].id),
+                                notificationID: i,
                                 task: taskList[i].task,
                                 time: taskList[i].time,
                                 honorific: userHonorific,
                                 startservice: initState,
                               )));
 
-                  AwesomeNotifications().createNotification(
-                    content: NotificationContent(
-                      id: 1,
-                      channelKey: 'key1',
-                      title: 'Hello, $userHonorific!',
-                      body: 'It is time to do your task.',
-                      fullScreenIntent: true,
-                    ),
-                    actionButtons: [
-                      NotificationActionButton(
-                        color: Colors.blue,
-                        key: 'dismiss',
-                        label: 'Dismiss',
-                        buttonType: ActionButtonType.Default,
-                      ),
-                    ],
-                  );
-
-                  AwesomeNotifications().actionStream.listen((event) {
-                    if (event.buttonKeyPressed == 'dismiss') {
-                      SystemNavigator.pop();
-                    }
-                  });
-
-                  speak(taskList[i].honorific, taskList[i].task);
-                  await handler.isReminded(int.parse(taskList[i].id), 1);
+                  Vibration.vibrate(pattern: [1000, 1500, 1000], repeat: 100);
+                  handler.isReminded(int.parse(taskList[i].id), 1);
 
                   if (taskList[i].repeat.contains('Only once')) {
-                    await handler.updateTaskStatus(
+                    handler.updateTaskStatus(
                         int.parse(taskList[i].id), 'disabled');
                   }
 
                   insertIntoHistory(
                       taskList[i].task, taskList[i].time, taskList[i].repeat);
-                }
-              },
-            );
 
-            if (taskList[i].status == 'active') {
-              tasks.add(ScheduledTasksList(taskList[i].id, task, 'active'));
-            } else {
-              tasks.add(ScheduledTasksList(taskList[i].id, task, 'disabled'));
-            }
+                  if (taskList[i].status == 'active') {
+                    tasks.add(ScheduledTasksList(i, 'active'));
+                  } else {
+                    tasks.add(ScheduledTasksList(i, 'disabled'));
+                  }
+                }
+              }
+            });
+
+            AwesomeNotifications().createdStream.listen((notification) {});
           }
 
           for (int j = 0; j < tasks.length; j++) {
             if (tasks[j].status == 'disabled') {
-              tasks[j].task.cancel();
+              AwesomeNotifications().cancel(tasks[j].id);
             }
           }
         }
