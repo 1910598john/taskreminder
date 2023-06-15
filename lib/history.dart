@@ -99,7 +99,7 @@ class _History extends State<History> {
               } else {
                 return Expanded(
                     child: Container(
-                        padding: EdgeInsets.fromLTRB(0, 0, 0, 70),
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                         child: ListView.builder(
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,7 @@ class Speech extends StatefulWidget {
   final String time;
   final String honorific;
   final Function startservice;
+  final Function cancelAll;
   const Speech({
     Key? key,
     required this.id,
@@ -22,6 +24,7 @@ class Speech extends StatefulWidget {
     required this.time,
     required this.honorific,
     required this.startservice,
+    required this.cancelAll,
   }) : super(key: key);
 
   @override
@@ -62,7 +65,7 @@ class _Speech extends State<Speech> {
                 child: Text(
                   widget.time,
                   style: const TextStyle(
-                      fontSize: 40,
+                      fontSize: 50,
                       color: Colors.white,
                       fontFamily: 'WorkSans'),
                 ),
@@ -77,12 +80,12 @@ class _Speech extends State<Speech> {
                     animatedTexts: [
                       TyperAnimatedText('Hello, ${widget.honorific}.',
                           textStyle: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 25,
                               color: Colors.white,
                               fontFamily: 'WorkSans')),
                       TyperAnimatedText('It is time to ${widget.task}.',
                           textStyle: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 25,
                               color: Colors.white,
                               fontFamily: 'WorkSans',
                               overflow: TextOverflow.ellipsis),
@@ -113,7 +116,7 @@ class _Speech extends State<Speech> {
                                   });
                                   Vibration.cancel();
                                   await flutterTts.stop();
-                                  widget.startservice();
+                                  await widget.startservice();
                                 },
                                 child: const Text(
                                   'Dismiss',

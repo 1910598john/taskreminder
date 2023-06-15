@@ -3,8 +3,10 @@ import 'package:taskreminder/db_helper.dart';
 
 class Tasks extends StatefulWidget {
   final Function start;
+  final Function cancelAll;
 
-  const Tasks({Key? key, required this.start}) : super(key: key);
+  const Tasks({Key? key, required this.start, required this.cancelAll})
+      : super(key: key);
 
   @override
   _Tasks createState() => _Tasks();
@@ -182,6 +184,7 @@ class _Tasks extends State<Tasks> {
                                                         TextButton(
                                                             onPressed:
                                                                 () async {
+                                                              setState(() {});
                                                               status.removeAt(
                                                                   index);
 
@@ -189,16 +192,14 @@ class _Tasks extends State<Tasks> {
                                                                       context)
                                                                   .pop();
 
-                                                              await handler
-                                                                  .deleteTask(
-                                                                      snapshot
-                                                                          .data![
-                                                                              index]
-                                                                          .id);
+                                                              handler.deleteTask(
+                                                                  snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .id);
 
                                                               await widget
                                                                   .start();
-                                                              setState(() {});
                                                             },
                                                             child: const Text(
                                                               'DELETE',
@@ -360,6 +361,7 @@ class _Tasks extends State<Tasks> {
                                                         TextButton(
                                                             onPressed:
                                                                 () async {
+                                                              setState(() {});
                                                               status.removeAt(
                                                                   index);
 
@@ -374,7 +376,6 @@ class _Tasks extends State<Tasks> {
                                                                       .id);
                                                               await widget
                                                                   .start();
-                                                              setState(() {});
                                                             },
                                                             child: const Text(
                                                               'DELETE',

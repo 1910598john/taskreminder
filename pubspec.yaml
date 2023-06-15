@@ -47,13 +47,14 @@ dependencies:
   wakelock: ^0.6.2
   flutter_tts: ^3.6.3
   flutter_launcher_icons: ^0.13.0
-  flutter_native_splash: ^2.2.19
   volume_control: ^0.1.5
   timezone: ^0.8.0
   workmanager: ^0.5.1
   awesome_notifications: ^0.6.19
   vibration: ^1.7.7
   android_alarm_manager_plus: ^3.0.0
+  flutter_native_splash: ^2.2.19
+  flutter_background: ^1.2.0
 
 
 

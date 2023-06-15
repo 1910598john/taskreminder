@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:day_picker/day_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:taskreminder/db_helper.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:math';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 FlutterTts flutterTts = FlutterTts();
 
 class SetAlarm extends StatefulWidget {
   final Function startService;
   final Function setVolume;
-
+  final List<int> lst;
   const SetAlarm(
-      {Key? key, required this.startService, required this.setVolume})
+      {Key? key,
+      required this.startService,
+      required this.setVolume,
+      required this.lst})
       : super(key: key);
 
   @override
@@ -56,6 +65,22 @@ class _SetAlarm extends State<SetAlarm> {
     flutterTts.setLanguage("en-US");
     flutterTts.setPitch(.3);
     flutterTts.setSpeechRate(0.5);
+
+    AwesomeNotifications().initialize(
+      'resource://mipmap/launcher_icon',
+      [
+        NotificationChannel(
+          channelKey: 'key1',
+          channelName: 'Channel Name',
+          channelDescription: 'Channel Description',
+        )
+      ],
+    );
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
   }
 
   //textfield tts assistant

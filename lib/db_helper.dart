@@ -103,10 +103,24 @@ class DataBase {
     return result;
   }
 
+  Future<void> removeDuplicates() async {
+    final Database db = await initializedDB();
+    final List<Map<String, Object?>> queryResult = await db
+        .rawQuery('SELECT * FROM history GROUP BY time ORDER BY id DESC');
+    await db.execute('DELETE FROM history');
+
+    queryResult.forEach((element) {
+      db.insert('history', element);
+    });
+  }
+
   Future<List<TasksHistory>> retrieveDoneTasks() async {
+    await removeDuplicates();
+
     final Database db = await initializedDB();
     final List<Map<String, Object?>> queryResult =
-        await db.query('history', columns: null, orderBy: 'id DESC');
+        await db.rawQuery('SELECT * FROM history ORDER BY id DESC');
+
     return queryResult.map((e) => TasksHistory.fromMap(e)).toList();
   }
 
