@@ -484,6 +484,17 @@ class _HomeScreen extends State<HomeScreen> {
                   ))),
         ],
       ),
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          height: 50,
+          color: const Color.fromARGB(255, 178, 141, 255),
+          child: const Center(
+              child: Text(
+            'team.taskreminder@gmail.com',
+            style: TextStyle(color: Colors.grey, fontSize: 15),
+          )),
+        ),
+      ),
       backgroundColor: const Color.fromARGB(255, 178, 141, 255),
     );
   }
