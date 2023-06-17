@@ -485,13 +485,16 @@ class _HomeScreen extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
+        elevation: 0,
         child: Container(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
           height: 50,
           color: const Color.fromARGB(255, 178, 141, 255),
           child: const Center(
               child: Text(
             'team.taskreminder@gmail.com',
-            style: TextStyle(color: Colors.grey, fontSize: 15),
+            style: TextStyle(
+                color: Color.fromARGB(255, 126, 98, 216), fontSize: 15),
           )),
         ),
       ),
