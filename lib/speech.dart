@@ -83,7 +83,7 @@ class _Speech extends State<Speech> {
                               fontSize: 25,
                               color: Colors.white,
                               fontFamily: 'WorkSans')),
-                      TyperAnimatedText('It is time to ${widget.task}.',
+                      TyperAnimatedText('It is time to ${widget.task}',
                           textStyle: const TextStyle(
                               fontSize: 25,
                               color: Colors.white,
