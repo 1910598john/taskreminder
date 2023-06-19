@@ -1,4 +1,3 @@
-import 'package:vibration/vibration.dart';
 import 'package:flutter/material.dart';
 import 'package:taskreminder/tasks.dart';
 import 'set_alarm.dart';
@@ -71,15 +70,14 @@ class _HomeScreen extends State<HomeScreen> {
       }
     });
 
-    //initialize tts
-    flutterTts.setLanguage("en-US");
-    flutterTts.setPitch(.3);
-    flutterTts.setSpeechRate(0.5);
-
     startService();
   }
 
   void speak(honorific, task) async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(.3);
+    await flutterTts.setSpeechRate(0.5);
+
     setState(() {
       running = true;
     });
