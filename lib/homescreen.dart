@@ -1,18 +1,15 @@
 import 'package:vibration/vibration.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:taskreminder/tasks.dart';
 import 'set_alarm.dart';
 import 'history.dart';
 import 'package:taskreminder/db_helper.dart';
-import 'package:cron/cron.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'speech.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:volume_control/volume_control.dart';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:wakelock/wakelock.dart';
 
 // import 'package:workmanager/workmanager.dart';
@@ -67,8 +64,7 @@ class _HomeScreen extends State<HomeScreen> {
             channelKey: 'key1',
             channelName: 'Channel Name',
             channelDescription: 'Channel Description',
-            importance: NotificationImportance.Max,
-            criticalAlerts: true)
+            importance: NotificationImportance.High)
       ],
     );
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
@@ -306,13 +302,6 @@ class _HomeScreen extends State<HomeScreen> {
 
           if (payload!['status'] == 'disabled') {
             cancelTask(int.parse("${payload['notifID']}"));
-          }
-        });
-
-        AwesomeNotifications().actionStream.listen((receivedNotification) {
-          if (receivedNotification.buttonKeyPressed == 'dismiss') {
-            dismissAll();
-            startService();
           }
         });
       } else {

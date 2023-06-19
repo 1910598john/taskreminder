@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:flutter/material.dart';
