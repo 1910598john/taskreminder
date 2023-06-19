@@ -102,7 +102,7 @@ class _HomeScreen extends State<HomeScreen> {
     double _val = await VolumeControl.volume;
 
     if (_val <= 0.4) {
-      VolumeControl.setVolume(0.7);
+      VolumeControl.setVolume(1);
     }
   }
 
@@ -233,7 +233,7 @@ class _HomeScreen extends State<HomeScreen> {
                       }),
                   actionButtons: [
                     NotificationActionButton(
-                      color: Colors.blue,
+                      color: const Color.fromARGB(255, 133, 91, 222),
                       key: 'dismiss',
                       label: 'Dismiss',
                       buttonType: ActionButtonType.Default,
@@ -249,24 +249,12 @@ class _HomeScreen extends State<HomeScreen> {
             }
           }
         }
-        AwesomeNotifications().createdStream.listen((notification) {
-          final payload = notification.payload;
-
-          if (payload!['status'] == 'disabled') {
-            cancelTask(int.parse("${payload['notifID']}"));
-          }
-        });
-
-        AwesomeNotifications().actionStream.listen((receivedNotification) {
+        AwesomeNotifications().displayedStream.listen((receivedNotification) {
           final payload = receivedNotification.payload;
 
           speak(userHonorific, payload!['task']);
 
           Wakelock.enable();
-          if (receivedNotification.buttonKeyPressed == 'dismiss') {
-            dismissAll();
-            startService();
-          }
 
           String weekday;
           var currentWeekday = DateFormat('EEEE');
@@ -310,6 +298,21 @@ class _HomeScreen extends State<HomeScreen> {
               tasks.add(ScheduledTasksList(
                   int.parse("${payload['notifID']}"), 'disabled'));
             }
+          }
+        });
+
+        AwesomeNotifications().createdStream.listen((notification) {
+          final payload = notification.payload;
+
+          if (payload!['status'] == 'disabled') {
+            cancelTask(int.parse("${payload['notifID']}"));
+          }
+        });
+
+        AwesomeNotifications().actionStream.listen((receivedNotification) {
+          if (receivedNotification.buttonKeyPressed == 'dismiss') {
+            dismissAll();
+            startService();
           }
         });
       } else {

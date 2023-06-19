@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -33,6 +34,8 @@ class Speech extends StatefulWidget {
 
 class _Speech extends State<Speech> {
   late DataBase handler;
+  ScrollController controller = ScrollController();
+  Timer? timer;
 
   @override
   void initState() {
@@ -40,6 +43,13 @@ class _Speech extends State<Speech> {
     Wakelock.enable();
     handler = DataBase();
     handler.initializedDB();
+
+    timer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
+      if (controller.hasClients) {
+        controller.animateTo(controller.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+      }
+    });
   }
 
   @override
@@ -56,7 +66,7 @@ class _Speech extends State<Speech> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.fromLTRB(0, 150, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 150, 0, 10),
                 child: Image.asset(
                   "assets/images/speech.gif",
                 ),
@@ -76,23 +86,27 @@ class _Speech extends State<Speech> {
               ),
               Container(
                   padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                  child: AnimatedTextKit(
-                    animatedTexts: [
-                      TyperAnimatedText('Hello, ${widget.honorific}.',
-                          textStyle: const TextStyle(
-                              fontSize: 25,
-                              color: Colors.white,
-                              fontFamily: 'WorkSans')),
-                      TyperAnimatedText('It is time to ${widget.task}',
-                          textStyle: const TextStyle(
-                              fontSize: 25,
-                              color: Colors.white,
-                              fontFamily: 'WorkSans',
-                              overflow: TextOverflow.ellipsis),
-                          speed: const Duration(milliseconds: 30)),
-                    ],
-                    repeatForever: true,
-                  )),
+                  child: SingleChildScrollView(
+                      controller: controller,
+                      scrollDirection: Axis.horizontal,
+                      child: AnimatedTextKit(
+                        onFinished: () => timer!.cancel(),
+                        animatedTexts: [
+                          TyperAnimatedText('Hello, ${widget.honorific}.',
+                              textStyle: const TextStyle(
+                                  fontSize: 25,
+                                  color: Colors.white,
+                                  fontFamily: 'WorkSans')),
+                          TyperAnimatedText('It is time to ${widget.task}',
+                              textStyle: const TextStyle(
+                                fontSize: 25,
+                                color: Colors.white,
+                                fontFamily: 'WorkSans',
+                              ),
+                              speed: const Duration(milliseconds: 30)),
+                        ],
+                        repeatForever: true,
+                      ))),
               const SizedBox(
                 height: 100,
                 width: 0,
@@ -105,9 +119,10 @@ class _Speech extends State<Speech> {
                           children: [
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 133, 91, 222),
                                   foregroundColor: Colors.white,
-                                  fixedSize: Size(120, 40),
+                                  fixedSize: const Size(120, 40),
                                 ),
                                 onPressed: () async {
                                   SystemNavigator.pop();
