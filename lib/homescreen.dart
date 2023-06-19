@@ -12,8 +12,6 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:volume_control/volume_control.dart';
 import 'package:wakelock/wakelock.dart';
 
-// import 'package:workmanager/workmanager.dart';
-
 FlutterTts flutterTts = FlutterTts();
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
