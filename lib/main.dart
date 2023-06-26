@@ -19,6 +19,7 @@ class _MyApp extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
     handler = DataBase();
     handler.initializedDB().whenComplete(() async {
       handler.getUserGender().then((value) {

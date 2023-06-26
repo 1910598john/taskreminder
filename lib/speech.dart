@@ -119,7 +119,7 @@ class _Speech extends State<Speech> {
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
-                                      const Color.fromARGB(255, 133, 91, 222),
+                                      const Color.fromARGB(255, 205, 61, 61),
                                   foregroundColor: Colors.white,
                                   fixedSize: const Size(120, 40),
                                 ),

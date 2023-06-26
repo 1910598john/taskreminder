@@ -31,16 +31,16 @@ class _Tasks extends State<Tasks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 178, 141, 255),
+        backgroundColor: const Color.fromARGB(255, 128, 0, 0),
         elevation: 0,
         leading: BackButton(
-          color: const Color.fromARGB(255, 78, 49, 170),
+          color: Colors.white,
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
-      backgroundColor: const Color.fromARGB(255, 178, 141, 255),
+      backgroundColor: const Color.fromARGB(255, 128, 0, 0),
       body: Column(children: [
         Container(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
@@ -53,12 +53,12 @@ class _Tasks extends State<Tasks> {
                 Shadow(
                   offset: Offset(1, 1),
                   blurRadius: 2,
-                  color: Color.fromARGB(255, 78, 49, 170),
+                  color: Color.fromARGB(255, 224, 82, 82),
                 ),
                 Shadow(
                   offset: Offset(1, 1),
                   blurRadius: 2,
-                  color: Color.fromARGB(255, 78, 49, 170),
+                  color: Color.fromARGB(255, 224, 82, 82),
                 ),
               ],
             ),
@@ -69,12 +69,12 @@ class _Tasks extends State<Tasks> {
                     Shadow(
                       offset: Offset(1, 1),
                       blurRadius: 2,
-                      color: Color.fromARGB(255, 78, 49, 170),
+                      color: Color.fromARGB(255, 224, 82, 82),
                     ),
                     Shadow(
                       offset: Offset(1, 1),
                       blurRadius: 2,
-                      color: Color.fromARGB(255, 78, 49, 170),
+                      color: Color.fromARGB(255, 224, 82, 82),
                     ),
                   ],
                   fontSize: 50,
@@ -100,7 +100,7 @@ class _Tasks extends State<Tasks> {
                       'No item',
                       style: TextStyle(
                         fontSize: 20,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -208,9 +208,9 @@ class _Tasks extends State<Tasks> {
                                                                 color: Color
                                                                     .fromARGB(
                                                                         255,
-                                                                        78,
-                                                                        49,
-                                                                        170),
+                                                                        128,
+                                                                        0,
+                                                                        0),
                                                               ),
                                                             )),
                                                         TextButton(
@@ -226,9 +226,9 @@ class _Tasks extends State<Tasks> {
                                                                 color: Color
                                                                     .fromARGB(
                                                                         255,
-                                                                        78,
-                                                                        49,
-                                                                        170),
+                                                                        128,
+                                                                        0,
+                                                                        0),
                                                               ),
                                                             ))
                                                       ],
@@ -256,16 +256,14 @@ class _Tasks extends State<Tasks> {
                                                     Text(
                                                       toDo,
                                                       style: const TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255, 78, 49, 170),
+                                                          color: Colors.white,
                                                           fontSize: 13),
                                                     ),
                                                     Text(
                                                       snapshot
                                                           .data![index].repeat,
                                                       style: const TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255, 78, 49, 170),
+                                                          color: Colors.white,
                                                           fontSize: 13),
                                                     )
                                                   ],
@@ -273,9 +271,15 @@ class _Tasks extends State<Tasks> {
                                                 Switch(
                                                   // This bool value toggles the switch.
                                                   value: status[index],
-                                                  activeColor:
+                                                  activeTrackColor:
                                                       const Color.fromARGB(
-                                                          255, 78, 49, 170),
+                                                          255, 224, 82, 82),
+                                                  activeColor: Colors.white,
+                                                  inactiveThumbColor:
+                                                      Colors.white,
+                                                  inactiveTrackColor:
+                                                      const Color.fromARGB(
+                                                          255, 224, 82, 82),
                                                   onChanged: (bool value) {
                                                     setState(() {
                                                       status[index] = value;
@@ -384,9 +388,9 @@ class _Tasks extends State<Tasks> {
                                                                 color: Color
                                                                     .fromARGB(
                                                                         255,
-                                                                        78,
-                                                                        49,
-                                                                        170),
+                                                                        128,
+                                                                        0,
+                                                                        0),
                                                               ),
                                                             )),
                                                         TextButton(
@@ -402,9 +406,9 @@ class _Tasks extends State<Tasks> {
                                                                 color: Color
                                                                     .fromARGB(
                                                                         255,
-                                                                        78,
-                                                                        49,
-                                                                        170),
+                                                                        128,
+                                                                        0,
+                                                                        0),
                                                               ),
                                                             ))
                                                       ],
@@ -432,16 +436,14 @@ class _Tasks extends State<Tasks> {
                                                     Text(
                                                       toDo,
                                                       style: const TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255, 78, 49, 170),
+                                                          color: Colors.white,
                                                           fontSize: 13),
                                                     ),
                                                     Text(
                                                       snapshot
                                                           .data![index].repeat,
                                                       style: const TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255, 78, 49, 170),
+                                                          color: Colors.white,
                                                           fontSize: 13),
                                                     )
                                                   ],
@@ -449,9 +451,15 @@ class _Tasks extends State<Tasks> {
                                                 Switch(
                                                   // This bool value toggles the switch.
                                                   value: status[index],
-                                                  activeColor:
+                                                  activeTrackColor:
                                                       const Color.fromARGB(
-                                                          255, 78, 49, 170),
+                                                          255, 224, 82, 82),
+                                                  activeColor: Colors.white,
+                                                  inactiveThumbColor:
+                                                      Colors.white,
+                                                  inactiveTrackColor:
+                                                      const Color.fromARGB(
+                                                          255, 224, 82, 82),
                                                   onChanged: (bool value) {
                                                     // This is called when the user toggles the switch.
                                                     setState(() {
@@ -473,8 +481,7 @@ class _Tasks extends State<Tasks> {
                                                 )
                                               ],
                                             ))),
-                                    const Divider(
-                                        color: Color.fromARGB(255, 78, 49, 170))
+                                    const Divider(color: Colors.white)
                                   ]),
                                 );
                               }

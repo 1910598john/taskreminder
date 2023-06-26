@@ -35,7 +35,7 @@ class _CheckGender extends State<CheckGender> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 178, 141, 255),
+      backgroundColor: const Color.fromARGB(255, 128, 0, 0),
       body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -50,12 +50,12 @@ class _CheckGender extends State<CheckGender> {
                       Shadow(
                         offset: Offset(1, 1),
                         blurRadius: 2,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Color.fromARGB(255, 224, 82, 82),
                       ),
                       Shadow(
                         offset: Offset(1, 1),
                         blurRadius: 2,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Color.fromARGB(255, 224, 82, 82),
                       ),
                     ],
                     fontWeight: FontWeight.bold,

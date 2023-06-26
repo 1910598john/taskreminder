@@ -145,9 +145,9 @@ class _SetAlarm extends State<SetAlarm> {
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
               // change the border color
-              primary: Color.fromARGB(255, 78, 49, 170),
+              primary: Color.fromARGB(255, 224, 82, 82),
               // change the text color
-              onSurface: Color.fromARGB(255, 78, 49, 170),
+              onSurface: Color.fromARGB(255, 224, 82, 82),
             ),
             // button colors
             buttonTheme: const ButtonThemeData(
@@ -217,14 +217,14 @@ class _SetAlarm extends State<SetAlarm> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color.fromARGB(255, 178, 141, 255),
+        backgroundColor: const Color.fromARGB(255, 128, 0, 0),
         leading: BackButton(
-            color: const Color.fromARGB(255, 78, 49, 170),
+            color: Colors.white,
             onPressed: () {
               Navigator.pop(context);
             }),
       ),
-      backgroundColor: const Color.fromARGB(255, 178, 141, 255),
+      backgroundColor: const Color.fromARGB(255, 128, 0, 0),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -271,7 +271,7 @@ class _SetAlarm extends State<SetAlarm> {
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
                           backgroundColor:
-                              const Color.fromARGB(255, 78, 49, 170),
+                              const Color.fromARGB(255, 224, 82, 82),
                           foregroundColor: Colors.white),
                       onPressed: () {
                         _showTimePicker();
@@ -296,15 +296,15 @@ class _SetAlarm extends State<SetAlarm> {
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   border: false,
-                  selectedDayTextColor: const Color.fromARGB(255, 78, 49, 170),
+                  selectedDayTextColor: Colors.red,
                   unSelectedDayTextColor: Colors.white,
                   boxDecoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30.0),
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       colors: [
-                        Color.fromARGB(255, 78, 49, 170),
-                        Color.fromARGB(255, 78, 49, 170)
+                        Color.fromARGB(255, 224, 82, 82),
+                        Color.fromARGB(255, 224, 82, 82)
                       ],
                       tileMode: TileMode
                           .repeated, // repeats the gradient over the canvas
@@ -322,22 +322,22 @@ class _SetAlarm extends State<SetAlarm> {
                   TextField(
                     controller: task,
                     style: const TextStyle(
-                      color: Color.fromARGB(255, 78, 49, 170),
+                      color: Colors.white,
                     ),
                     decoration: const InputDecoration(
                       labelText: 'Your task',
                       labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Colors.white,
                       ),
                       enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                         width: 1,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Colors.white,
                       )),
                       focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                         width: 1,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Colors.white,
                       )),
                     ),
                   )
@@ -351,7 +351,7 @@ class _SetAlarm extends State<SetAlarm> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  backgroundColor: const Color.fromARGB(255, 78, 49, 170),
+                  backgroundColor: const Color.fromARGB(255, 224, 82, 82),
                   foregroundColor: Colors.white,
                   fixedSize: const Size(150, 50),
                 ),
@@ -376,7 +376,7 @@ class _SetAlarm extends State<SetAlarm> {
                                     'CANCEL',
                                     style: TextStyle(
                                       fontSize: 15,
-                                      color: Color.fromARGB(255, 78, 49, 170),
+                                      color: Color.fromARGB(255, 128, 0, 0),
                                     ),
                                   )),
                               TextButton(
@@ -420,7 +420,7 @@ class _SetAlarm extends State<SetAlarm> {
                                     'YES',
                                     style: TextStyle(
                                       fontSize: 15,
-                                      color: Color.fromARGB(255, 78, 49, 170),
+                                      color: Color.fromARGB(255, 128, 0, 0),
                                     ),
                                   ))
                             ],

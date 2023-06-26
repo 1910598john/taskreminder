@@ -50,6 +50,7 @@ class _HomeScreen extends State<HomeScreen> {
   List<ScheduledTasksList> tasks = [];
   bool speaking = true;
   List<int> idList = [];
+  List<TasksHistory> history = [];
 
   @override
   void initState() {
@@ -119,6 +120,7 @@ class _HomeScreen extends State<HomeScreen> {
   }
 
   void startService() async {
+    history.clear();
     late String userHonorific;
     var now = DateTime.now();
     handler = DataBase();
@@ -161,9 +163,9 @@ class _HomeScreen extends State<HomeScreen> {
                     }),
                 actionButtons: [
                   NotificationActionButton(
-                    color: Colors.blue,
+                    color: const Color.fromARGB(255, 224, 82, 82),
                     key: 'dismiss',
-                    label: 'Dismiss',
+                    label: 'Open',
                     buttonType: ActionButtonType.Default,
                   ),
                 ],
@@ -178,31 +180,31 @@ class _HomeScreen extends State<HomeScreen> {
             int spaceCount = value[i].repeat.split(" ").length - 1;
             String repeat = value[i].repeat;
             for (int k = 0; k < spaceCount; k++) {
-              if (value[i].repeat.contains('Sun')) {
+              if (repeat.contains('Sun')) {
                 weekdays.add(0);
-                repeat.replaceAll('Sun', '');
-              } else if (value[i].repeat.contains('Mon')) {
+                repeat = repeat.replaceAll("Sun", "");
+              } else if (repeat.contains('Mon')) {
                 weekdays.add(1);
-                repeat.replaceAll('Mon', '');
-              } else if (value[i].repeat.contains('Tue')) {
+                repeat = repeat.replaceAll("Mon", "");
+              } else if (repeat.contains('Tue')) {
                 weekdays.add(2);
-                repeat.replaceAll('Tue', '');
-              } else if (value[i].repeat.contains('Wed')) {
+                repeat = repeat.replaceAll("Tue", "");
+              } else if (repeat.contains('Wed')) {
                 weekdays.add(3);
-                repeat.replaceAll('Wed', '');
-              } else if (value[i].repeat.contains('Thu')) {
+                repeat = repeat.replaceAll("Wed", "");
+              } else if (repeat.contains('Thu')) {
                 weekdays.add(4);
-                repeat.replaceAll('Thu', '');
-              } else if (value[i].repeat.contains('Fri')) {
+                repeat = repeat.replaceAll("Thu", "");
+              } else if (repeat.contains('Fri')) {
                 weekdays.add(5);
-                repeat.replaceAll('Fri', '');
-              } else if (value[i].repeat.contains('Sat')) {
+                repeat = repeat.replaceAll("Fri", "");
+              } else if (repeat.contains('Sat')) {
                 weekdays.add(6);
-                repeat.replaceAll('Sat', '');
+                repeat = repeat.replaceAll("Sat", "");
               }
             }
 
-            for (var weekday in weekdays) {
+            for (int x = 0; x < weekdays.length; x++) {
               AwesomeNotifications().createNotification(
                   content: NotificationContent(
                       id: i,
@@ -225,14 +227,14 @@ class _HomeScreen extends State<HomeScreen> {
                       }),
                   actionButtons: [
                     NotificationActionButton(
-                      color: const Color.fromARGB(255, 133, 91, 222),
+                      color: const Color.fromARGB(255, 224, 82, 82),
                       key: 'dismiss',
-                      label: 'Dismiss',
+                      label: 'Open',
                       buttonType: ActionButtonType.Default,
                     ),
                   ],
                   schedule: NotificationCalendar(
-                      weekday: weekday,
+                      weekday: weekdays[x],
                       hour: time.hour,
                       minute: time.minute,
                       second: 0,
@@ -304,6 +306,18 @@ class _HomeScreen extends State<HomeScreen> {
         cancelAllTasks();
       }
     });
+
+    await handler.retrieveDoneTasks().then((value) {
+      if (value.isNotEmpty) {
+        for (int i = 0; i < value.length; i++) {
+          TasksHistory task = TasksHistory(
+              task: value[i].task,
+              time: value[i].time,
+              repeat: value[i].repeat);
+          history.add(task);
+        }
+      }
+    });
   }
 
   @override
@@ -322,12 +336,12 @@ class _HomeScreen extends State<HomeScreen> {
                       Shadow(
                         offset: Offset(1, 1),
                         blurRadius: 2,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Color.fromARGB(255, 224, 82, 82),
                       ),
                       Shadow(
                         offset: Offset(1, 1),
                         blurRadius: 2,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Color.fromARGB(255, 224, 82, 82),
                       ),
                     ],
                     fontSize: 50,
@@ -343,12 +357,12 @@ class _HomeScreen extends State<HomeScreen> {
                       Shadow(
                         offset: Offset(1, 1),
                         blurRadius: 2,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Color.fromARGB(255, 224, 82, 82),
                       ),
                       Shadow(
                         offset: Offset(1, 1),
                         blurRadius: 2,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Color.fromARGB(255, 224, 82, 82),
                       ),
                     ],
                     fontSize: 50,
@@ -376,7 +390,7 @@ class _HomeScreen extends State<HomeScreen> {
                   children: const [
                     Icon(
                       Icons.alarm,
-                      color: Color.fromARGB(255, 78, 49, 170),
+                      color: Colors.white,
                       size: 25,
                     ),
                     SizedBox(
@@ -385,16 +399,14 @@ class _HomeScreen extends State<HomeScreen> {
                     ),
                     Text(
                       'Set Reminder',
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 78, 49, 170),
-                          fontSize: 20),
+                      style: TextStyle(color: Colors.white, fontSize: 20),
                     )
                   ],
                 )),
           ),
           const Divider(
             thickness: 1,
-            color: Color.fromARGB(255, 78, 49, 170),
+            color: Colors.white,
             indent: 70,
             endIndent: 70,
           ),
@@ -418,7 +430,7 @@ class _HomeScreen extends State<HomeScreen> {
                     children: const [
                       Icon(
                         Icons.task,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Colors.white,
                         size: 25,
                       ),
                       SizedBox(
@@ -427,15 +439,13 @@ class _HomeScreen extends State<HomeScreen> {
                       ),
                       Text(
                         'Tasks',
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 78, 49, 170),
-                            fontSize: 20),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       )
                     ],
                   ))),
           const Divider(
             thickness: 1,
-            color: Color.fromARGB(255, 78, 49, 170),
+            color: Colors.white,
             indent: 70,
             endIndent: 70,
           ),
@@ -443,8 +453,12 @@ class _HomeScreen extends State<HomeScreen> {
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const History()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => History(
+                              history: history,
+                            )));
               },
               child: Container(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -454,7 +468,7 @@ class _HomeScreen extends State<HomeScreen> {
                     children: const [
                       Icon(
                         Icons.history,
-                        color: Color.fromARGB(255, 78, 49, 170),
+                        color: Colors.white,
                         size: 25,
                       ),
                       SizedBox(
@@ -464,7 +478,7 @@ class _HomeScreen extends State<HomeScreen> {
                       Text(
                         'History',
                         style: TextStyle(
-                          color: Color.fromARGB(255, 78, 49, 170),
+                          color: Colors.white,
                           fontSize: 20,
                         ),
                       )
@@ -475,18 +489,18 @@ class _HomeScreen extends State<HomeScreen> {
       bottomNavigationBar: BottomAppBar(
         elevation: 0,
         child: Container(
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
           height: 50,
-          color: const Color.fromARGB(255, 178, 141, 255),
+          color: const Color.fromARGB(255, 128, 0, 0),
           child: const Center(
               child: Text(
             'team.taskreminder@gmail.com',
             style: TextStyle(
-                color: Color.fromARGB(255, 126, 98, 216), fontSize: 15),
+                color: Color.fromARGB(255, 242, 121, 121), fontSize: 15),
           )),
         ),
       ),
-      backgroundColor: const Color.fromARGB(255, 178, 141, 255),
+      backgroundColor: const Color.fromARGB(255, 128, 0, 0),
     );
   }
 }
