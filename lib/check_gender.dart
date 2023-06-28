@@ -86,7 +86,7 @@ class _CheckGender extends State<CheckGender> {
                   },
                   child: Container(
                       child: const Image(
-                    image: AssetImage("assets/images/male.png"),
+                    image: AssetImage("assets/images/Male.png"),
                     width: 100,
                     height: 100,
                   )),
@@ -107,7 +107,7 @@ class _CheckGender extends State<CheckGender> {
                   },
                   child: Container(
                       child: const Image(
-                    image: AssetImage("assets/images/female.png"),
+                    image: AssetImage("assets/images/Female.png"),
                     width: 100,
                     height: 100,
                   )),

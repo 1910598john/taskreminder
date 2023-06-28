@@ -6,7 +6,6 @@ import 'package:wakelock/wakelock.dart';
 import 'package:flutter/material.dart';
 import 'homescreen.dart';
 import 'package:taskreminder/db_helper.dart';
-import 'package:vibration/vibration.dart';
 
 class Speech extends StatefulWidget {
   final int id;
@@ -128,7 +127,7 @@ class _Speech extends State<Speech> {
                                   setState(() {
                                     running = false;
                                   });
-                                  Vibration.cancel();
+                                  //Vibration.cancel();
                                   await flutterTts.stop();
                                   await widget.startservice();
                                 },

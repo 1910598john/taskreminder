@@ -135,76 +135,72 @@ class _HomeScreen extends State<HomeScreen> {
       if (value.isNotEmpty) {
         cancelAllTasks();
         for (int i = 0; i < value.length; i++) {
-          bool repeat = true;
-
           DateTime time = DateFormat("hh:mm a").parse(value[i].time);
-
-          if (value[i].repeat == 'Only once') {
-            repeat = false;
-            AwesomeNotifications().createNotification(
-                content: NotificationContent(
-                    id: i,
-                    channelKey: 'key1',
-                    title: 'Hello, $userHonorific!',
-                    body: 'It is time to do your task.',
-                    fullScreenIntent: true,
-                    wakeUpScreen: true,
-                    locked: true,
-                    criticalAlert: true,
-                    payload: {
-                      "id": "${value[i].id}",
-                      "task": value[i].task,
-                      "time": value[i].time,
-                      "honorific": userHonorific,
-                      "status": value[i].status,
-                      "repeat": value[i].repeat,
-                      "reminded": "${value[i].reminded}",
-                      "notifID": "$i",
-                    }),
-                actionButtons: [
-                  NotificationActionButton(
-                    color: const Color.fromARGB(255, 224, 82, 82),
-                    key: 'dismiss',
-                    label: 'Open',
-                    buttonType: ActionButtonType.Default,
-                  ),
-                ],
-                schedule: NotificationCalendar(
-                    hour: time.hour,
-                    minute: time.minute,
-                    second: 0,
-                    preciseAlarm: true,
-                    repeats: repeat));
-          } else {
-            List<int> weekdays = [];
-            int spaceCount = value[i].repeat.split(" ").length - 1;
-            String repeat = value[i].repeat;
-            for (int k = 0; k < spaceCount; k++) {
-              if (repeat.contains('Sun')) {
-                weekdays.add(0);
-                repeat = repeat.replaceAll("Sun", "");
-              } else if (repeat.contains('Mon')) {
-                weekdays.add(1);
-                repeat = repeat.replaceAll("Mon", "");
-              } else if (repeat.contains('Tue')) {
-                weekdays.add(2);
-                repeat = repeat.replaceAll("Tue", "");
-              } else if (repeat.contains('Wed')) {
-                weekdays.add(3);
-                repeat = repeat.replaceAll("Wed", "");
-              } else if (repeat.contains('Thu')) {
-                weekdays.add(4);
-                repeat = repeat.replaceAll("Thu", "");
-              } else if (repeat.contains('Fri')) {
-                weekdays.add(5);
-                repeat = repeat.replaceAll("Fri", "");
-              } else if (repeat.contains('Sat')) {
-                weekdays.add(6);
-                repeat = repeat.replaceAll("Sat", "");
-              }
+          //if (value[i].repeat == 'Only once') {
+          AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                  id: i,
+                  channelKey: 'key1',
+                  title: 'Hello, $userHonorific!',
+                  body: 'It is time to do your task.',
+                  fullScreenIntent: true,
+                  wakeUpScreen: true,
+                  locked: true,
+                  criticalAlert: true,
+                  payload: {
+                    "id": "${value[i].id}",
+                    "task": value[i].task,
+                    "time": value[i].time,
+                    "honorific": userHonorific,
+                    "status": value[i].status,
+                    "repeat": value[i].repeat,
+                    "reminded": "${value[i].reminded}",
+                    "notifID": "$i",
+                  }),
+              actionButtons: [
+                NotificationActionButton(
+                  color: const Color.fromARGB(255, 224, 82, 82),
+                  key: 'dismiss',
+                  label: 'Open',
+                  buttonType: ActionButtonType.Default,
+                ),
+              ],
+              schedule: NotificationCalendar(
+                  hour: time.hour,
+                  minute: time.minute,
+                  second: 0,
+                  preciseAlarm: true,
+                  repeats: false));
+          //} else {
+          List<int> weekdays = [];
+          int spaceCount = value[i].repeat.split(" ").length;
+          String repeat = value[i].repeat;
+          for (int k = 0; k < spaceCount; k++) {
+            if (repeat.contains('Sun')) {
+              weekdays.add(0);
+              repeat = repeat.replaceAll("Sun", "");
+            } else if (repeat.contains('Mon')) {
+              weekdays.add(1);
+              repeat = repeat.replaceAll("Mon", "");
+            } else if (repeat.contains('Tue')) {
+              weekdays.add(2);
+              repeat = repeat.replaceAll("Tue", "");
+            } else if (repeat.contains('Wed')) {
+              weekdays.add(3);
+              repeat = repeat.replaceAll("Wed", "");
+            } else if (repeat.contains('Thu')) {
+              weekdays.add(4);
+              repeat = repeat.replaceAll("Thu", "");
+            } else if (repeat.contains('Fri')) {
+              weekdays.add(5);
+              repeat = repeat.replaceAll("Fri", "");
+            } else if (repeat.contains('Sat')) {
+              weekdays.add(6);
+              repeat = repeat.replaceAll("Sat", "");
             }
-
-            for (int x = 0; x < weekdays.length; x++) {
+          }
+          /*
+            for (int y = 0; y < weekdays.length; y++) {
               AwesomeNotifications().createNotification(
                   content: NotificationContent(
                       id: i,
@@ -217,7 +213,7 @@ class _HomeScreen extends State<HomeScreen> {
                       criticalAlert: true,
                       payload: {
                         "id": "${value[i].id}",
-                        "task": value[i].task,
+                        "task": "${weekdays.length}",
                         "time": value[i].time,
                         "honorific": userHonorific,
                         "status": value[i].status,
@@ -234,51 +230,43 @@ class _HomeScreen extends State<HomeScreen> {
                     ),
                   ],
                   schedule: NotificationCalendar(
-                      weekday: weekdays[x],
+                      weekday: weekdays[y],
                       hour: time.hour,
                       minute: time.minute,
                       second: 0,
                       preciseAlarm: true,
                       repeats: false));
             }
-          }
+            */
+          //}
         }
         AwesomeNotifications().displayedStream.listen((receivedNotification) {
           final payload = receivedNotification.payload;
-
-          speak(userHonorific, payload!['task']);
-
-          Wakelock.enable();
 
           String weekday;
           var currentWeekday = DateFormat('EEEE');
           weekday = currentWeekday.format(DateTime.now()).toString();
           weekday = weekday.substring(0, 3);
 
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => Speech(
-                        id: int.parse("${payload['id']}"),
-                        notificationID: int.parse("${payload['notifID']}"),
-                        task: "${payload['task']}",
-                        time: "${payload['time']}",
-                        honorific: userHonorific,
-                        startservice: initState,
-                        cancelAll: cancelAllTasks,
-                      )));
-
-          if (payload['reminded'] == '0') {
-            handler.isReminded(int.parse("${payload['id']}"), 1);
-
-            insertIntoHistory(
-                payload['task'], payload['time'], payload['repeat']);
-          }
-
-          if (payload['repeat']!.contains(weekday) ||
+          if (payload!['repeat']!.contains(weekday) ||
               (payload['repeat']!.contains('Only once') &&
                   payload['reminded'] == '0')) {
+            speak(userHonorific, payload['task']);
+
+            Wakelock.enable();
             // Vibration.vibrate(pattern: [1000, 1500, 1000], repeat: 100);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Speech(
+                          id: int.parse("${payload['id']}"),
+                          notificationID: int.parse("${payload['notifID']}"),
+                          task: "${payload['task']}",
+                          time: "${payload['time']}",
+                          honorific: userHonorific,
+                          startservice: initState,
+                          cancelAll: cancelAllTasks,
+                        )));
 
             if (payload['repeat']!.contains('Only once')) {
               handler.updateTaskStatus(
@@ -292,6 +280,9 @@ class _HomeScreen extends State<HomeScreen> {
               tasks.add(ScheduledTasksList(
                   int.parse("${payload['notifID']}"), 'disabled'));
             }
+          } else {
+            AwesomeNotifications()
+                .cancelSchedule(int.parse("${payload['notifID']}"));
           }
         });
 
@@ -300,6 +291,16 @@ class _HomeScreen extends State<HomeScreen> {
 
           if (payload!['status'] == 'disabled') {
             cancelTask(int.parse("${payload['notifID']}"));
+          }
+        });
+
+        AwesomeNotifications().actionStream.listen((event) {
+          final payload = event.payload;
+          if (payload!['reminded'] == '0') {
+            handler.isReminded(int.parse("${payload['id']}"), 1);
+
+            insertIntoHistory(
+                payload['task'], payload['time'], payload['repeat']);
           }
         });
       } else {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:taskreminder/db_helper.dart';
-import 'db_helper.dart';
 
 class History extends StatefulWidget {
   final List<TasksHistory> history;
@@ -19,6 +18,10 @@ class _History extends State<History> {
     super.initState();
     handler = DataBase();
     handler.initializedDB();
+  }
+
+  void delete(id) async {
+    await handler.deleteHistory(id);
   }
 
   @override
@@ -144,12 +147,15 @@ class _History extends State<History> {
                                     ),
                                     Row(
                                       children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {});
+                                        InkWell(
+                                          splashColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: () async {
+                                            setState(() {
+                                              widget.history.removeAt(index);
+                                            });
 
-                                            handler.deleteHistory(
-                                                widget.history[index].id);
+                                            delete(widget.history[index].id);
                                           },
                                           child: const Icon(
                                             Icons.delete_sharp,
@@ -199,12 +205,15 @@ class _History extends State<History> {
                                     ),
                                     Row(
                                       children: [
-                                        GestureDetector(
+                                        InkWell(
+                                          splashColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
                                           onTap: () {
-                                            setState(() {});
+                                            setState(() {
+                                              widget.history.removeAt(index);
+                                            });
 
-                                            handler.deleteHistory(
-                                                widget.history[index].id);
+                                            delete(widget.history[index].id);
                                           },
                                           child: const Icon(
                                             Icons.delete_sharp,
